@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'GA_MEASUREMENT_ID');
+</script>
+<title>AnonyAI</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anuphan:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap">
+<style>
+/* Layout: one narrow phone column — form card on top, result slab, then comparison list */
+:root{
+  --bg:#f6f3f4; --surface:#ffffff; --ink:#24181c; --muted:#6f6166; --line:#e6dcdf;
+  --accent:#c8102e; --accent-ink:#ffffff; --accent-soft:#fbe7ea; --ok:#1d7a4f; --warn:#a4561a;
+  --display:"Anuphan","IBM Plex Sans Thai",system-ui,sans-serif;
+  --body:"IBM Plex Sans Thai",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#161113; --surface:#211a1d; --ink:#f3eaed; --muted:#b0a1a7; --line:#3a2f33;
+  --accent:#ff4d64; --accent-ink:#1a0006; --accent-soft:#3a1820; --ok:#5fd39b; --warn:#f0a35f; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#161113; --surface:#211a1d; --ink:#f3eaed; --muted:#b0a1a7; --line:#3a2f33;
+  --accent:#ff4d64; --accent-ink:#1a0006; --accent-soft:#3a1820; --ok:#5fd39b; --warn:#f0a35f; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
+main{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+header h1{font-family:var(--display);font-size:1.6rem;margin:0;letter-spacing:.01em}
+header p{margin:2px 0 0;color:var(--muted);font-size:.9rem}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:18px}
+label,.lbl{font-weight:600;font-size:.92rem;display:block;margin-bottom:6px}
+.hint{color:var(--muted);font-size:.8rem;font-weight:400}
+input[type=text],input[type=number],select{width:100%;font:inherit;font-size:1.05rem;padding:10px 12px;border:1px solid var(--line);
+  border-radius:10px;background:var(--bg);color:var(--ink);min-width:0}
+input:focus-visible,select:focus-visible,button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:4px}
+.seg button{font:inherit;font-weight:600;border:0;border-radius:9px;padding:9px 6px;background:transparent;color:var(--muted);cursor:pointer;line-height:1.25}
+.seg button small{display:block;font-weight:400;font-size:.75rem}
+.seg button[aria-pressed=true]{background:var(--accent);color:var(--accent-ink)}
+.row{display:flex;gap:8px;align-items:center}
+.row input{flex:1}
+.step{font:inherit;font-weight:700;font-size:1.2rem;width:44px;height:44px;flex:none;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer}
+input[type=range]{width:100%;accent-color:var(--accent);margin:10px 0 0;height:28px}
+.ticks{display:flex;justify-content:space-between;color:var(--muted);font-size:.75rem;font-variant-numeric:tabular-nums}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chips button{font:inherit;font-size:.82rem;border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:999px;padding:4px 12px;cursor:pointer}
+.result{background:var(--accent);color:var(--accent-ink);border-radius:14px;padding:18px 16px;display:flex;flex-direction:column;gap:6px}
+.result .who{font-size:.9rem;opacity:.9}
+.result .amt{font-family:var(--display);font-weight:700;font-size:2.4rem;line-height:1.1;font-variant-numeric:tabular-nums}
+.result .amt span{font-size:1rem;font-weight:500}
+.result.bad{background:var(--surface);color:var(--ink);border:1px solid var(--warn)}
+.result.bad .amt{font-size:1.1rem;color:var(--warn)}
+dl{margin:0;display:grid;grid-template-columns:1fr auto;gap:6px 12px;font-variant-numeric:tabular-nums}
+dt{color:var(--muted)} dd{margin:0;text-align:right;font-weight:600}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{flex:1;min-width:140px;text-align:center;font:inherit;font-weight:600;padding:11px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;text-decoration:none}
+.btn.line{background:#06c755;color:#fff;border-color:#06c755}
+h2{font-family:var(--display);font-size:1.1rem;margin:0}
+.notes{color:var(--muted);font-size:.8rem;margin:0;padding-left:18px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:8px 16px;border-radius:999px;font-size:.9rem}
+</style>
+<style>
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+
+<main>
+  <header>
+    <h1>AnonyAI</h1>
+    <p>คำนวณเบี้ยประกันรายปี ตามอัตราเบี้ยมาตรฐานในโบรชัวร์ (01/01/2023)</p>
+  </header>
+
+  <section class="card" aria-label="ข้อมูลผู้เอาประกัน">
+    <div>
+      <label for="plan">แบบประกัน</label>
+      <select id="plan">
+        <option value="plp">AIA Pay Life Plus</option>
+        <option value="p20">AIA 20Pay Life</option>
+      </select>
+    </div>
+
+    <div id="termBox">
+      <span class="lbl">ระยะเวลาชำระเบี้ย</span>
+      <div class="seg" id="term" style="grid-template-columns:repeat(3,1fr)">
+        <button type="button" data-v="10">10 ปี</button>
+        <button type="button" data-v="15">15 ปี</button>
+        <button type="button" data-v="20">20 ปี</button>
+      </div>
+    </div>
+
+    <div>
+      <span class="lbl">เพศ</span>
+      <div class="seg" id="sex">
+        <button type="button" data-v="M" aria-pressed="true">ชาย</button>
+        <button type="button" data-v="F" aria-pressed="false">หญิง</button>
+      </div>
+    </div>
+
+    <div>
+      <label for="age">อายุ (ปี) <span class="hint" id="ageHint"></span></label>
+      <div class="row">
+        <button type="button" class="step" id="ageDn" aria-label="ลดอายุ">−</button>
+        <input type="number" id="age" inputmode="numeric" min="0" max="75" value="40">
+        <button type="button" class="step" id="ageUp" aria-label="เพิ่มอายุ">+</button>
+      </div>
+      <input type="range" id="ageR" min="0" max="75" step="1" value="40" aria-label="เลื่อนเลือกอายุ">
+      <div class="ticks"><span>15 วัน</span><span id="ageMid"></span><span id="ageMax"></span></div>
+    </div>
+
+    <div>
+      <label for="sa">ทุนประกัน (บาท) <span class="hint" id="saHint"></span></label>
+      <input type="text" id="sa" inputmode="numeric" value="300,000">
+      <input type="range" id="saR" min="0" max="9999999" step="50000" value="300000" aria-label="เลื่อนเลือกทุนประกัน">
+      <div class="ticks"><span id="saMin"></span><span>10 ล้าน</span></div>
+      <div class="chips" id="chips"></div>
+    </div>
+
+    <div>
+      <label for="mode">งวดการชำระเบี้ย</label>
+      <select id="mode">
+        <option value="12">รายปี</option>
+        <option value="6">ราย 6 เดือน</option>
+        <option value="3">ราย 3 เดือน</option>
+        <option value="1">รายเดือน</option>
+      </select>
+    </div>
+  </section>
+
+  <section class="result" id="result" aria-live="polite">
+    <div class="who" id="who"></div>
+    <div class="amt" id="amt"></div>
+    <div class="who" id="sub"></div>
+  </section>
+
+  <section class="card">
+    <dl id="detail"></dl>
+    <div class="actions">
+      <a class="btn line" id="lineBtn" href="#" target="_blank" rel="noopener">ส่งทาง LINE</a>
+      <button type="button" class="btn" id="copyBtn">คัดลอกผลลัพธ์</button>
+    </div>
+  </section>
+
+  <ul class="notes">
+    <li>เป็นอัตราเบี้ยมาตรฐานรายปีและหักส่วนลดทุนสูงแล้ว ยังไม่รวมสัญญาเพิ่มเติม</li>
+    <li>เบี้ยจริงขึ้นอยู่กับการพิจารณารับประกันและการตรวจสุขภาพของบริษัท</li>
+    <li>Pay Life Plus ส่วนลด: ทุน 500,000–699,999 ลด 1.00 บาท, ตั้งแต่ 700,000 ลด 1.50 บาท ต่อทุน 1,000</li>
+    <li>20Pay Life ส่วนลด: ทุน 250,000–599,999 ลด 1 บาท, ตั้งแต่ 600,000 ลด 2 บาท ต่อทุน 1,000</li>
+  </ul>
+</main>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+const S = s => s.trim().split(/\s+/).map(Number);
+const PLP = {
+ 10:{M:S(`24.35 24.56 24.96 25.37 25.80 26.25 26.72 27.20 27.72 28.26 28.83 29.43 30.03 30.66 31.28 31.92 32.57 33.23 33.89 34.57 35.27 35.97 36.71 37.47 38.26 39.07 39.93 40.82 41.76 42.72 43.74 44.79 45.89 47.04 48.21 49.45 50.72 52.05
+ 53.43 54.86 56.33 57.87 59.47 61.13 62.84 64.64 66.48 68.23 69.86 71.55 73.29 75.09 76.95 78.88 80.89 82.98 85.17 87.45 89.85 92.36 95.00 97.79 100.74 103.86 107.17 110.71 114.51 118.58 122.97 127.72 132.85 138.39 144.37 150.82 157.76 165.20`),
+     F:S(`19.37 19.60 19.97 20.33 20.71 21.11 21.52 21.93 22.39 22.84 23.31 23.80 24.31 24.84 25.38 25.95 26.53 27.13 27.75 28.40 29.07 29.78 30.50 31.25 32.03 32.85 33.69 34.57 35.50 36.45 37.44 38.49 39.57 40.70 41.88 43.10 44.37 45.71
+ 47.09 48.53 50.03 51.28 52.58 53.93 55.33 56.78 58.30 59.86 61.49 63.15 64.74 66.38 68.09 69.86 71.70 73.61 75.59 77.65 79.80 82.04 84.39 86.86 89.46 92.22 95.15 98.28 101.64 105.23 109.10 113.26 117.73 122.53 127.68 133.20 139.12 145.44`)},
+ 15:{M:S(`17.53 17.69 17.96 18.26 18.56 18.89 19.22 19.57 19.94 20.33 20.74 21.16 21.60 22.04 22.50 22.96 23.42 23.88 24.35 24.84 25.33 25.84 26.36 26.91 27.47 28.05 28.67 29.30 29.98 30.67 31.39 32.16 32.95 33.77 34.63 35.52 36.44 37.41
+ 38.41 39.45 40.54 41.66 42.83 44.06 45.32 46.49 47.63 48.82 50.05 51.34 52.67 54.07 55.52 57.05 58.66 60.35 62.15 64.05 66.08 68.25 70.57 73.06 75.74 78.64 81.78 85.19 88.90 92.95 97.36 102.18 107.44 113.17 119.40 126.16 133.48 141.39`),
+     F:S(`15.42 15.53 15.74 15.95 16.17 16.41 16.65 16.91 17.17 17.44 17.72 18.02 18.33 18.65 18.98 19.32 19.67 20.03 20.41 20.80 21.21 21.64 22.08 22.54 23.01 23.51 24.02 24.56 25.12 25.71 26.32 26.96 27.62 28.31 29.03 29.79 30.58 31.41
+ 32.26 33.15 34.09 35.06 36.07 37.11 38.21 39.35 40.54 41.78 43.08 44.43 45.85 47.27 48.54 49.88 51.28 52.74 54.29 55.91 57.63 59.46 61.41 63.50 65.75 68.17 70.80 73.66 76.78 80.17 83.87 87.91 92.30 97.09 102.29 107.94 114.07 120.72`)},
+ 20:{M:S(`14.80 14.86 15.06 15.25 15.46 15.69 15.93 16.18 16.45 16.73 17.03 17.35 17.67 18.00 18.33 18.66 19.00 19.34 19.69 20.03 20.39 20.76 21.15 21.54 21.96 22.40 22.85 23.34 23.85 24.38 24.94 25.53 26.16 26.81 27.48 28.19 28.93 29.71
+ 30.52 31.37 32.25 33.18 34.15 35.17 36.24 37.35 38.54 39.76 41.06 42.20 43.40 44.66 46.00 47.41 48.92 50.53 52.26 54.12 56.12 58.29 60.64 63.20 65.97 68.99 72.29 75.89 79.81 84.11 87.15 92.04 97.53 101.92 108.33 115.30 122.85 131.01`),
+     F:S(`13.31 13.31 13.35 13.43 13.55 13.69 13.85 14.04 14.23 14.44 14.69 14.93 15.18 15.45 15.73 15.96 16.21 16.46 16.72 16.99 17.28 17.57 17.90 18.22 18.56 18.92 19.30 19.70 20.11 20.56 21.01 21.49 21.99 22.53 23.08 23.66 24.28 24.92
+ 25.59 26.30 27.03 27.79 28.61 29.45 30.33 31.26 32.24 33.27 34.35 35.48 36.68 37.96 39.30 40.73 42.10 43.44 44.86 46.39 48.03 49.79 51.70 53.77 56.02 58.48 61.17 64.11 67.34 70.88 74.76 77.83 82.43 85.67 91.05 96.92 103.31 110.27`)}
+};
+const P20 = {
+ M:S(`12.76 12.81 12.98 13.15 13.33 13.53 13.73 13.95 14.18 14.42 14.68 14.96 15.23 15.52 15.80 16.09 16.38 16.67 16.97 17.27 17.58 17.90 18.23 18.57 18.93 19.31 19.70 20.12 20.56 21.02 21.50 22.01 22.55 23.11 23.69 24.30 24.94 25.61 26.31 27.04 27.80 28.60 29.44 30.32 31.24 32.20 33.22 34.28 35.40 36.57 37.81 39.13 40.51 41.99 43.56 45.25 47.05 48.99 51.08 53.33 55.77 58.42 61.29 64.19 66.96 69.89 71.99 73.80 75.13 76.40 78.11`),
+ F:S(`11.47 11.47 11.51 11.58 11.68 11.80 11.94 12.10 12.27 12.45 12.66 12.87 13.09 13.32 13.56 13.76 13.97 14.19 14.41 14.65 14.90 15.15 15.43 15.71 16.00 16.31 16.64 16.98 17.34 17.72 18.11 18.53 18.96 19.42 19.90 20.40 20.93 21.48 22.06 22.67 23.30 23.96 24.66 25.39 26.15 26.95 27.79 28.68 29.61 30.59 31.62 32.72 33.88 35.11 36.41 37.81 39.29 40.89 42.60 44.44 46.43 48.59 50.93 53.49 56.27 59.32 61.90 63.61 64.71 66.13 67.07`)
+};
+const plpDisc = sa => sa >= 700000 ? 1.5 : sa >= 500000 ? 1 : 0;
+const p20Disc = sa => sa >= 600000 ? 2 : sa >= 250000 ? 1 : 0;
+const PLANS = [
+ {id:"plp10", name:"Pay Life Plus", short:"ชำระ 10 ปี", full:"AIA Pay Life Plus (Non Par) ชำระเบี้ย 10 ปี", rate:(s,a)=>PLP[10][s][a], maxAge:75, minSA:300000, maxSA:9999999, disc:plpDisc},
+ {id:"plp15", name:"Pay Life Plus", short:"ชำระ 15 ปี", full:"AIA Pay Life Plus (Non Par) ชำระเบี้ย 15 ปี", rate:(s,a)=>PLP[15][s][a], maxAge:75, minSA:300000, maxSA:9999999, disc:plpDisc},
+ {id:"plp20", name:"Pay Life Plus", short:"ชำระ 20 ปี", full:"AIA Pay Life Plus (Non Par) ชำระเบี้ย 20 ปี", rate:(s,a)=>PLP[20][s][a], maxAge:75, minSA:150000, maxSA:9999999, disc:plpDisc},
+ {id:"p20", name:"20Pay Life", short:"ชำระ 20 ปี", full:"AIA 20Pay Life (Non Par) ชำระเบี้ย 20 ปี", rate:(s,a)=>P20[s][a], maxAge:70, minSA:100000, maxSA:9999999, disc:p20Disc}
+];
+const st = {sex:"M", plan:"plp20", age:40, sa:300000};
+const $ = id => document.getElementById(id);
+const fmt = n => n.toLocaleString("th-TH",{maximumFractionDigits:0});
+const fmt2 = n => n.toLocaleString("th-TH",{minimumFractionDigits:2,maximumFractionDigits:2});
+const ageTxt = a => a === 0 ? "15 วัน" : a + " ปี";
+const sexTxt = s => s === "M" ? "ชาย" : "หญิง";
+
+function calc(p, sex, age, sa){
+  if (age > p.maxAge) return {err:`รับประกันอายุ 15 วัน – ${p.maxAge} ปี`};
+  if (sa < p.minSA) return {err:`ทุนขั้นต่ำ ${fmt(p.minSA)} บาท`};
+  if (sa > p.maxSA) return {err:`ทุนสูงสุด ${fmt(p.maxSA)} บาท`};
+  const base = p.rate(sex, age), d = p.disc(sa), net = +(base - d).toFixed(2);
+  return {base, d, net, prem: Math.round(net * sa / 1000 * 100) / 100};
+}
+
+const planEl = $("plan");
+function seg(el, key){
+  el.addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    st[key] = b.dataset.v; render();
+  });
+}
+seg($("sex"),"sex");
+let term = "20";
+const syncPlan = () => { st.plan = planEl.value === "p20" ? "p20" : "plp" + term; };
+planEl.addEventListener("change", () => { syncPlan(); render(); });
+$("term").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  term = b.dataset.v; syncPlan(); render();
+});
+
+const clampAge = v => Math.max(0, Math.min(75, Math.round(v) || 0));
+$("age").addEventListener("input", e => { if (e.target.value === "") return; st.age = clampAge(+e.target.value); render(true); });
+$("age").addEventListener("change", () => render());
+$("ageR").addEventListener("input", e => { st.age = +e.target.value; render(); });
+$("ageDn").onclick = () => { st.age = clampAge(st.age - 1); render(); };
+$("ageUp").onclick = () => { st.age = clampAge(st.age + 1); render(); };
+
+$("sa").addEventListener("input", e => {
+  const n = +e.target.value.replace(/[^\d]/g,"");
+  st.sa = Math.min(n, 99999999);
+  const pos = e.target.value.length - e.target.selectionStart;
+  e.target.value = n ? fmt(n) : "";
+  try { const p = Math.max(0, e.target.value.length - pos); e.target.setSelectionRange(p,p); } catch(_){}
+  render(true);
+});
+$("saR").addEventListener("input", e => { st.sa = Math.max(+e.target.value, curPlan().minSA); render(); });
+[500000,1000000,2000000,5000000].forEach(v => {
+  const b = document.createElement("button"); b.type="button";
+  b.textContent = v >= 1e6 ? (v/1e6)+" ล้าน" : fmt(v);
+  b.onclick = () => { st.sa = v; render(); };
+  $("chips").appendChild(b);
+});
+
+const MODES = {"12":{f:1,t:"รายปี",u:"บาท/ปี"},"6":{f:0.51,t:"ราย 6 เดือน",u:"บาท/6 เดือน"},"3":{f:0.27,t:"ราย 3 เดือน",u:"บาท/3 เดือน"},"1":{f:0.09,t:"รายเดือน",u:"บาท/เดือน"}};
+$("mode").addEventListener("change", () => render());
+const track = (name, params) => { try { window.gtag && gtag("event", name, params); } catch(_){} };
+let calcTimer, lastSent = "";
+function trackCalc(params){
+  clearTimeout(calcTimer);
+  calcTimer = setTimeout(() => {
+    const key = JSON.stringify(params);
+    if (key === lastSent) return;
+    lastSent = key; track("calculate", params);
+  }, 1500);
+}
+let lastParams = {};
+const curPlan = () => PLANS.find(p => p.id === st.plan);
+let shareText = "";
+
+function render(typing){
+  const p = curPlan();
+  [...$("sex").children].forEach(b => b.setAttribute("aria-pressed", b.dataset.v === st.sex));
+  $("ageR").max = p.maxAge; $("age").max = p.maxAge;
+  $("ageMax").textContent = p.maxAge + " ปี"; $("ageMid").textContent = Math.round(p.maxAge/2) + " ปี";
+  $("ageHint").textContent = "· " + ageTxt(st.age) + (st.age === 0 ? " (ใส่ 0 = 15 วัน)" : "");
+  $("ageR").value = Math.min(st.age, p.maxAge);
+  if (!typing || document.activeElement !== $("age")) $("age").value = st.age;
+  $("saR").min = p.minSA; $("saR").value = Math.min(st.sa, p.maxSA);
+  $("saMin").textContent = fmt(p.minSA);
+  $("saHint").textContent = `· ขั้นต่ำ ${fmt(p.minSA)}`;
+  if (!typing || document.activeElement !== $("sa")) $("sa").value = st.sa ? fmt(st.sa) : "";
+
+  const r = calc(p, st.sex, st.age, st.sa);
+  const res = $("result");
+  $("who").textContent = `${sexTxt(st.sex)} ${ageTxt(st.age)} · ทุน ${fmt(st.sa)} บาท`;
+  if (r.err){
+    res.classList.add("bad");
+    $("amt").textContent = r.err; $("sub").textContent = p.full;
+    $("detail").innerHTML = `<dt>สถานะ</dt><dd>คำนวณไม่ได้</dd>`;
+    shareText = "";
+  } else {
+    res.classList.remove("bad");
+    const m = MODES[$("mode").value], mp = Math.round(r.prem * m.f * 100) / 100;
+    $("amt").innerHTML = `${fmt2(mp)} <span>${m.u}</span>`;
+    $("sub").textContent = p.full;
+    $("detail").innerHTML =
+      `<dt>อัตราเบี้ยมาตรฐาน / ทุน 1,000</dt><dd>${fmt2(r.base)}</dd>
+       <dt>ส่วนลดทุนสูง / ทุน 1,000</dt><dd>${r.d ? "−"+fmt2(r.d) : "ไม่มี"}</dd>
+       <dt>อัตราสุทธิ / ทุน 1,000</dt><dd>${fmt2(r.net)}</dd>
+       <dt>เบี้ยรายปี</dt><dd>${fmt2(r.prem)} บาท</dd>` +
+      (m.f === 1 ? "" : `<dt>เบี้ย${m.t} (รายปี × ${m.f})</dt><dd>${fmt2(mp)} บาท</dd>`);
+    shareText = `ใบเสนอเบี้ยประกัน\n${sexTxt(st.sex)} อายุ ${ageTxt(st.age)}\n${p.full}\nทุนประกัน ${fmt(st.sa)} บาท\nเบี้ย${m.t} ${fmt2(mp)} บาท\n(อัตรามาตรฐาน ขึ้นอยู่กับการพิจารณารับประกันของบริษัท)`;
+  }
+  lastParams = {
+    plan: p.id, plan_name: p.full, payment_term: p.id === "p20" ? 20 : +p.id.slice(3),
+    payment_mode: MODES[$("mode").value].t, sex: sexTxt(st.sex), age: st.age, sum_assured: st.sa,
+    annual_premium: r.err ? 0 : r.prem,
+    modal_premium: r.err ? 0 : Math.round(r.prem * MODES[$("mode").value].f * 100) / 100,
+    result: r.err ? "error" : "ok", error_message: r.err || ""
+  };
+  trackCalc(lastParams);
+  $("lineBtn").href = shareText ? "https://line.me/R/share?text=" + encodeURIComponent(shareText) : "#";
+  $("lineBtn").setAttribute("aria-disabled", !shareText);
+
+  planEl.value = st.plan === "p20" ? "p20" : "plp";
+  $("termBox").hidden = st.plan === "p20";
+  [...$("term").children].forEach(b => b.setAttribute("aria-pressed", b.dataset.v === term));
+}
+
+function toast(t){ const el=$("toast"); el.textContent=t; el.hidden=false; clearTimeout(toast.t); toast.t=setTimeout(()=>el.hidden=true,1800); }
+$("copyBtn").onclick = () => {
+  if (!shareText) return toast("ตรวจอายุและทุนประกันก่อน");
+  track("copy_result", lastParams);
+  navigator.clipboard.writeText(shareText).then(()=>toast("คัดลอกแล้ว"), ()=>toast("คัดลอกไม่ได้ ลองกดค้างที่ผลลัพธ์"));
+};
+$("lineBtn").addEventListener("click", e => { if (!shareText){ e.preventDefault(); toast("ตรวจอายุและทุนประกันก่อน"); return; } track("share_line", lastParams); });
+render();
+</script>
+
+</body>
+</html>
