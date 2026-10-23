@@ -15,6 +15,7 @@
 :root{
   --bg:#f8f3f3; --surface:#ffffff; --ink:#221516; --muted:#6e5b5c; --line:#ead9da;
   --accent:#c01f30; --accent-soft:#fbe7e9; --accent-ink:#ffffff; --warn:#8a5a00; --warn-soft:#fbf1dc; --track:#ecd6d8;
+  --line-green:#06c755;
   --display:"Anuphan","IBM Plex Sans Thai",system-ui,sans-serif;
   --body:"IBM Plex Sans Thai",system-ui,sans-serif;
   --mono:"IBM Plex Mono","IBM Plex Sans Thai",ui-monospace,Menlo,monospace;
@@ -97,6 +98,14 @@ dd.neg{color:var(--accent)}
 .compare td{font-family:var(--mono)}
 .compare tr.on td{color:var(--accent);font-weight:600}
 .notes{font-size:12.5px;color:var(--muted);display:grid;gap:6px;margin:0;padding-left:18px}
+.share{display:flex;gap:8px;flex-wrap:wrap}
+.sh{all:unset;box-sizing:border-box;cursor:pointer;display:inline-flex;align-items:center;gap:7px;padding:9px 14px;border-radius:10px;font-weight:600;font-size:14px;line-height:1.2}
+.sh svg{width:18px;height:18px;flex:none}
+.sh-line{background:var(--line-green);color:#fff}
+.sh-mail{background:var(--accent);color:var(--accent-ink)}
+.sh-copy{border:1px solid var(--line);color:var(--muted);font-weight:500}
+.sh:hover{filter:brightness(1.07)}
+.sh:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 footer{font-size:12.5px;color:var(--muted);max-width:80ch}
 @media (prefers-reduced-motion:no-preference){.big .v{transition:color .2s}}
 </style>
@@ -160,6 +169,11 @@ footer{font-size:12.5px;color:var(--muted);max-width:80ch}
         <span class="daily" id="sDaily"></span>
       </div>
       <dl id="sDetail"></dl>
+      <div class="share" id="shareBox">
+        <a class="sh sh-line" id="shLine" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3C6.5 3 2 6.6 2 11c0 3.9 3.5 7.2 8.3 7.9.3.1.8.2.9.5.1.3.1.7 0 1l-.1.9c0 .3-.2 1 .9.5s5.9-3.5 8-6c1.4-1.6 2-3.1 2-4.8C22 6.6 17.5 3 12 3z"/></svg>ส่ง LINE</a>
+        <a class="sh sh-mail" id="shMail"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M3 6h18v12H3zM3 7l9 6 9-6"/></svg>ส่งอีเมล</a>
+        <button type="button" class="sh sh-copy" id="shCopy">คัดลอกข้อความ</button>
+      </div>
       <div class="compare" id="cmpBox">
         <p class="label" style="margin:0"><span>เทียบทุกระยะเวลาชำระเบี้ย</span></p>
         <table><thead><tr><th>ชำระเบี้ย</th><th>อัตรา/1,000</th><th>เบี้ยต่อปี</th><th>เบี้ยรวม</th></tr></thead><tbody id="cmp"></tbody></table>
@@ -210,6 +224,7 @@ const PLANS = [
   col:(t,s,big)=>(big?2:0)+(s==='m'?0:1), disc:()=>0, chips:[15000000,20000000,50000000,100000000]},
 ];
 
+let shareMsg = '';
 const S = {plan:PLANS[0], g:'m', term:20, age:35, sa:1000000};
 const $ = id => document.getElementById(id);
 const saMinOf = (p,t) => typeof p.saMin==='function' ? p.saMin(t) : p.saMin;
@@ -304,10 +319,22 @@ function render(){
   $('msg').hidden=!errs.length; $('msg').textContent=errs.join(' · ');
   const r = errs.length ? null : calc(p,S.term,S.g,S.age,S.sa);
   if(!r){
-    $('sPrem').innerHTML='–'; $('sDaily').textContent='ปรับอายุหรือทุนประกันให้อยู่ในเงื่อนไขของแบบนี้';
+    $('sPrem').innerHTML='–'; $('shareBox').hidden=true; $('sDaily').textContent='ปรับอายุหรือทุนประกันให้อยู่ในเงื่อนไขของแบบนี้';
     $('sDetail').innerHTML=''; $('cmp').innerHTML=''; $('cmpBox').hidden=true;
   } else {
     $('sPrem').innerHTML=`${money(r.prem)}<small>บาท</small>`;
+    const gx = p.unisex ? 'ชาย/หญิง' : (S.g==='m'?'ชาย':'หญิง');
+    shareMsg = [`สรุปเบี้ยประกัน (Anonynowhere)`,
+      `แบบ: ${p.name} – ${p.th}`,
+      `ผู้เอาประกัน: ${gx} อายุ ${ageText(S.age)}`,
+      `ทุนประกัน: ${fmt0(S.sa)} บาท`,
+      `ชำระเบี้ย: ${termLabel(S.term)}${typeof S.term==='number'?'':` (${r.yrs} ปี)`}`,
+      `เบี้ยประกันรายปี: ${money(r.prem)} บาท`,
+      `เบี้ยรวมตลอดสัญญา: ${money(r.total)} บาท`,
+      `* ประมาณการจากอัตราเบี้ยมาตรฐาน เบี้ยจริงขึ้นกับการพิจารณารับประกัน`].join('\n');
+    $('shLine').href = 'https://line.me/R/share?text=' + encodeURIComponent(shareMsg);
+    $('shMail').href = 'mailto:?subject=' + encodeURIComponent(`สรุปเบี้ยประกัน ${p.name}`) + '&body=' + encodeURIComponent(shareMsg);
+    $('shareBox').hidden=false;
     $('sDaily').textContent=`เฉลี่ยวันละ ${fmt2(r.prem/365)} บาท`;
     const rows=[['ทุนประกัน',fmt0(S.sa)+' บาท'],['อัตราเบี้ยมาตรฐาน / ทุน 1,000',fmt2(r.base)]];
     if(r.big) rows.push([`ส่วนลด ${p.legacyDisc[S.term]}% (ทุนตั้งแต่ 20 ล้าน)`,'−'+fmt2(r.base-r.rate),'neg']);
@@ -355,6 +382,13 @@ $('saInput').addEventListener('input',e=>{
   render();});
 $('saInput').addEventListener('blur',()=>render());
 $('saChips').addEventListener('click',e=>{const b=e.target.closest('button'); if(b){S.sa=+b.dataset.sa; render();}});
+
+$('shCopy').addEventListener('click',()=>{
+  const b=$('shCopy'), done=t=>{b.textContent=t; setTimeout(()=>b.textContent='คัดลอกข้อความ',1800);};
+  const fallback=()=>{const ta=document.createElement('textarea'); ta.value=shareMsg; document.body.appendChild(ta); ta.select();
+    let ok=false; try{ok=document.execCommand('copy');}catch(_){} ta.remove(); done(ok?'คัดลอกแล้ว':'คัดลอกไม่สำเร็จ');};
+  try{ navigator.clipboard.writeText(shareMsg).then(()=>done('คัดลอกแล้ว'), fallback); }catch(_){ fallback(); }
+});
 
 renderPlans(); renderTerms(); setupRanges(); render();
 </script>
