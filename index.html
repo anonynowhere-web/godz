@@ -132,15 +132,6 @@ body{margin:0}
       <div class="chips" id="chips"></div>
     </div>
 
-    <div>
-      <label for="mode">งวดการชำระเบี้ย</label>
-      <select id="mode">
-        <option value="12">รายปี</option>
-        <option value="6">ราย 6 เดือน</option>
-        <option value="3">ราย 3 เดือน</option>
-        <option value="1">รายเดือน</option>
-      </select>
-    </div>
 
     <div>
       <span class="lbl">สัญญาเพิ่มเติม</span>
@@ -256,7 +247,6 @@ $("saR").addEventListener("input", e => { st.sa = Math.max(+e.target.value, curP
 });
 
 const MODES = {"12":{f:1,t:"รายปี",u:"บาท/ปี"},"6":{f:0.51,t:"ราย 6 เดือน",u:"บาท/6 เดือน"},"3":{f:0.27,t:"ราย 3 เดือน",u:"บาท/3 เดือน"},"1":{f:0.09,t:"รายเดือน",u:"บาท/เดือน"}};
-$("mode").addEventListener("change", () => render());
 const RIDERS = [
   {id:"hbx", name:"AIA HB Extra", plans:["1,000/วัน","2,000/วัน","3,000/วัน","4,000/วัน","5,000/วัน"], maxAge:70}
 ];
@@ -327,7 +317,7 @@ function render(typing){
     shareText = "";
   } else {
     res.classList.remove("bad");
-    const m = MODES[$("mode").value];
+    const m = MODES["12"];
     riders.forEach(x => x.prem = riderPrem(x));
     const active = riders.filter(x => x.prem != null);
     const pending = riders.filter(x => x.prem == null);
@@ -349,9 +339,9 @@ function render(typing){
   }
   lastParams = {
     plan: p.id, plan_name: p.full, payment_term: p.id === "p20" ? 20 : +p.id.slice(3),
-    payment_mode: MODES[$("mode").value].t, sex: sexTxt(st.sex), age: st.age, sum_assured: st.sa,
+    payment_mode: MODES["12"].t, sex: sexTxt(st.sex), age: st.age, sum_assured: st.sa,
     annual_premium: r.err ? 0 : r.prem,
-    modal_premium: r.err ? 0 : Math.round((r.prem + riders.reduce((a, x) => a + (riderPrem(x) || 0), 0)) * MODES[$("mode").value].f * 100) / 100,
+    modal_premium: r.err ? 0 : Math.round((r.prem + riders.reduce((a, x) => a + (riderPrem(x) || 0), 0)) * MODES["12"].f * 100) / 100,
     result: r.err ? "error" : "ok", error_message: r.err || "",
     riders: riders.map(riderName).join(", "),
     rider_premium: riders.reduce((a, x) => a + (riderPrem(x) || 0), 0)
