@@ -79,6 +79,10 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
 .riders b{font-family:var(--display);font-weight:600;font-size:14.5px;display:block;line-height:1.35}
 .riders small{color:var(--muted);font-size:12.5px;display:block;line-height:1.4}
 .riders .rp{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:14px;text-align:right;white-space:nowrap}
+.rideradd .sanote{color:var(--muted);font-size:13px}
+.riders .risa{grid-column:1/-1;display:grid;gap:4px}
+.riders .risa .numwrap{max-width:220px}
+.riders .risa .numwrap input{font-size:15px;padding:7px 0}
 .riders .rp.off{color:var(--warn);font-family:var(--body);font-size:12.5px;white-space:normal}
 .riders select{grid-column:1/-1;width:100%;max-width:100%;font:inherit;font-size:13px;padding:4px 6px;border:1px solid var(--line);border-radius:7px;background:var(--field);color:var(--ink)}
 .rm{all:unset;cursor:pointer;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;color:var(--muted);font-size:18px;line-height:1}
@@ -169,6 +173,7 @@ footer{font-size:12.5px;color:var(--muted);max-width:80ch}
         <div class="rideradd">
           <select id="riderPick" class="planselect" aria-label="เลือกสัญญาเพิ่มเติม"></select>
           <select id="riderPlanPick" class="planselect" aria-label="เลือกแผนของสัญญาเพิ่มเติม"></select>
+          <span id="riderSaNote" class="sanote" hidden></span>
           <button type="button" id="riderAdd" class="addbtn">+ เพิ่ม</button>
         </div>
         <ul class="riders" id="riderList"></ul>
@@ -244,7 +249,7 @@ const PLANS = [
 ];
 
 let shareMsg = '';
-/* Riders: flat annual premium by entry-age band and gender, entry age 11-75 (Health Happy 07/2025, Health Saver 01/2026) */
+/* Riders: flat annual premium by entry-age band and gender (Health Happy 07/2025, Health Saver 01/2026, Health Starter); CI Plus 07/2025 = rate per 1,000 x rider SA */
 function bandPremium(age,g,plan){const i=this.bands.findIndex(([a,b])=>age>=a&&age<=b); return i<0?null:this.rates[g][i][plan-1];}
 const RIDERS=[
  {id:'hh', name:'Health Happy', th:'ค่ารักษาพยาบาลแบบเหมาจ่าย', ages:[11,75],
@@ -267,13 +272,21 @@ const RIDERS=[
    begin:{bands:[[0,5],[6,10],[11,15],[16,20],[21,25],[26,30],[31,35],[36,40],[41,45],[46,50],[51,55],[56,60],[61,65],[66,70],[71,75]], m:[[32700,46200,55600,70500,86700],[17200,25100,28900,36400,43700],[8500,12900,15300,19300,23000],[3700,6300,7600,9800,11600],[3800,6400,7800,9900,11700],[4100,7000,8600,11100,13100],[4300,7300,9000,11700,13700],[4500,7700,9400,12100,14300],[4900,8200,10100,13000,15300],[5100,8600,10500,13500,15900],[7100,11900,14500,18700,22000],[9500,15600,19000,24400,28900],[13700,20900,25600,33000,39000],[19800,28700,35000,45300,55700],[29700,41100,50200,65200,77300]], f:[[32600,45900,53600,68000,83700],[16200,23700,27400,34300,41300],[7700,11900,14000,17600,21500],[3900,7100,8100,11000,13400],[4200,7700,9000,11900,14500],[4300,8200,9400,12400,15000],[4800,8300,10100,13400,15700],[5100,8600,10500,13700,16200],[5500,9200,11400,15000,17600],[5700,10000,12300,16200,19700],[7700,13000,16000,20700,24500],[10400,16700,20500,26700,31600],[15000,22500,27700,36200,42900],[21600,30900,38000,50000,59300],[32400,44600,54700,72200,85700]]},
    bal:{bands:[[11,15],[16,20],[21,25],[26,30],[31,35],[36,40],[41,45],[46,50],[51,55],[56,60],[61,65],[66,70],[71,75]], m:[[9400,14300,17000,21400,25500],[4100,7000,8400,10800,12800],[4200,7100,8600,11000,13000],[4500,7700,9500,12300,14500],[4700,8100,10000,12900,15200],[5000,8500,10400,13400,15800],[5400,9100,11200,14400,17000],[5600,9500,11600,14900,17600],[7800,13200,16100,20700,24400],[10500,17300,21100,27100,32100],[15200,23200,28400,36600,43300],[22000,31800,38800,50300,61800],[33000,45600,55700,72400,85800]], f:[[8500,13200,15500,19500,23800],[4300,7800,9000,12200,14800],[4600,8500,10000,13200,16100],[4700,9100,10400,13700,16600],[5300,9200,11200,14800,17400],[5600,9500,11600,15200,18000],[6100,10200,12600,16600,19500],[6200,11100,13600,18000,21800],[8500,14400,17700,23000,27200],[11500,18500,22700,29600,35100],[16600,25000,30700,40200,47600],[24000,34300,42200,55500,65800],[36000,49500,60700,80200,95200]]}},
   premium(g,age,n){const pl=this.plans[n-1],tb=this.tables[pl.t];const i=tb.bands.findIndex(([a,b])=>age>=a&&age<=b);return i<0?null:tb[g][i][pl.c];}},
+ {id:'ci', name:'CI Plus', th:'คุ้มครองโรคร้ายแรง 44 โรค/การรักษา', ages:[0,75], saCfg:{min:100000,max:25000000,step:100000,def:1000000},
+  bands:[[0,15],[16,20],[21,25],[26,30],[31,35],[36,40],[41,45],[46,50],[51,55],[56,60],[61,65],[66,70],[71,75]],
+  rates:{m:[2.62,2.76,2.89,3.16,3.84,5.23,10.19,15.92,25.38,42.31,61.04,81.76,112.64], f:[2.27,2.06,2.15,2.55,3.53,4.6,6.38,10.17,15.92,26.09,35.81,51.71,73.52]},
+  premium(g,age,_,sa){const i=this.bands.findIndex(([a,b])=>age>=a&&age<=b); return i<0?null:Math.round(this.rates[g][i]*sa/10)/100;}},
 ];
 const riderDef = id => RIDERS.find(x=>x.id===id);
-const planAges = (d,n) => (n && d.plans[n-1] && d.plans[n-1].ages) || d.ages;
+const planAges = (d,n) => (n && d.plans && d.plans[n-1] && d.plans[n-1].ages) || d.ages;
 const rangeText = ([a,b]) => `${a===0?'15 วัน':a}–${b} ปี`;
-const riderPrem = rd => { const d=riderDef(rd.id), [a,b]=planAges(d,rd.plan); return (S.age>=a&&S.age<=b) ? d.premium(S.g,S.age,rd.plan) : null; };
+const saOk = (d,sa) => !d.saCfg || (isFinite(sa) && sa>=d.saCfg.min && sa<=d.saCfg.max);
+const riderPrem = rd => { const d=riderDef(rd.id), [a,b]=planAges(d,rd.plan); return (S.age>=a&&S.age<=b&&saOk(d,rd.sa)) ? d.premium(S.g,S.age,rd.plan,rd.sa) : null; };
+const riderSaToPos = (c,sa) => Math.round(Math.sqrt(Math.max(0,Math.min(1,(sa-c.min)/(c.max-c.min))))*1000);
+const riderPosToSa = (c,pos) => Math.round((c.min+(c.max-c.min)*(pos/1000)**2)/c.step)*c.step;
 const planText = (d,n) => { const pl=d.plans[n-1]; return pl.detail ? `${pl.label} · ${pl.detail}` : `${pl.label} · ค่าห้อง ${pl.room} บาท/วัน`; };
 const planShort = (d,n) => d.plans[n-1].label;
+const riderLabel = (d,rd) => d.saCfg ? `ทุน ${fmt0(rd.sa)} บาท` : planShort(d,rd.plan);
 const S = {plan:PLANS[0], g:'m', term:20, age:35, sa:1000000, riders:[]};
 const $ = id => document.getElementById(id);
 const saMinOf = (p,t) => typeof p.saMin==='function' ? p.saMin(t) : p.saMin;
@@ -389,7 +402,7 @@ function render(){
       `ทุนประกัน: ${fmt0(S.sa)} บาท`,
       `ชำระเบี้ย: ${termLabel(S.term)}${typeof S.term==='number'?'':` (${r.yrs} ปี)`}`,
       `เบี้ยแบบหลักรายปี: ${money(r.prem)} บาท`,
-      ...rAdds.map(x=>`สัญญาเพิ่มเติม ${x.d.name} ${planShort(x.d,x.rd.plan)}: ${money(x.v)} บาท/ปี`),
+      ...rAdds.map(x=>`สัญญาเพิ่มเติม ${x.d.name} ${riderLabel(x.d,x.rd)}: ${money(x.v)} บาท/ปี`),
       ...(rAdds.length?[`เบี้ยรวมปีแรก: ${money(first)} บาท`]:[]),
       `เบี้ยแบบหลักรวมตลอดสัญญา: ${money(r.total)} บาท`,
       `* ประมาณการจากอัตราเบี้ยมาตรฐาน เบี้ยจริงขึ้นกับการพิจารณารับประกัน`].join('\n');
@@ -398,7 +411,7 @@ function render(){
     $('shareBox').hidden=false;
     $('sDaily').textContent=`เฉลี่ยวันละ ${fmt2(first/365)} บาท`;
     const rows=[];
-    if(rAdds.length){ rows.push(['เบี้ยแบบหลัก / ปี',money(r.prem)+' บาท']); rAdds.forEach(x=>rows.push([`${x.d.name} ${planShort(x.d,x.rd.plan)} / ปี`,money(x.v)+' บาท'])); }
+    if(rAdds.length){ rows.push(['เบี้ยแบบหลัก / ปี',money(r.prem)+' บาท']); rAdds.forEach(x=>rows.push([`${x.d.name} ${riderLabel(x.d,x.rd)} / ปี`,money(x.v)+' บาท'])); }
     rows.push(['ทุนประกัน',fmt0(S.sa)+' บาท'],['อัตราเบี้ยมาตรฐาน / ทุน 1,000',fmt2(r.base)]);
     if(r.big) rows.push([`ส่วนลด ${p.legacyDisc[S.term]}% (ทุนตั้งแต่ 20 ล้าน)`,'−'+fmt2(r.base-r.rate),'neg']);
     if(r.d) rows.push(['ส่วนลดตามทุนประกัน / ทุน 1,000','−'+fmt2(r.d),'neg']);
@@ -429,7 +442,9 @@ function renderRiders(){
   if(free.some(d=>d.id===keep)) pick.value=keep;
   const cur=riderDef(pick.value);
   const keepPlan=pp.value;
-  setHTML(pp, cur ? cur.plans.map(pl=>`<option value="${pl.n}">${pl.label}</option>`).join('') : '<option value="">–</option>');
+  pp.hidden=!!(cur&&cur.saCfg); $('riderSaNote').hidden=!pp.hidden;
+  if(cur&&cur.saCfg) $('riderSaNote').textContent=`ทุนเริ่มต้น ${fmt0(cur.saCfg.def)} บาท ปรับได้หลังกดเพิ่ม`;
+  setHTML(pp, cur && cur.plans ? cur.plans.map(pl=>`<option value="${pl.n}">${pl.label}</option>`).join('') : '<option value="">–</option>');
   if(cur && keepPlan) pp.value=keepPlan;
   if(cur && !pp.value) pp.value='1';
   const curAges = cur && planAges(cur,+pp.value);
@@ -438,11 +453,23 @@ function renderRiders(){
   pick.disabled=!free.length; pp.disabled=!cur; add.disabled=!cur||!ageOk;
   $('riderHint').textContent = !free.length ? 'เพิ่มได้สัญญาละ 1 ครั้ง' : (cur && !ageOk ? `แผนนี้รับประกันอายุ ${rangeText(curAges)}` : 'เพิ่มได้สัญญาละ 1 ครั้ง');
   setHTML($('riderList'), S.riders.map((rd,i)=>{
-    const d=riderDef(rd.id), v=riderPrem(rd);
-    const opts=d.plans.map(pl=>`<option value="${pl.n}"${pl.n===rd.plan?' selected':''}>${planText(d,pl.n)}</option>`).join('');
-    const price = v==null ? `<span class="rp off">ไม่รับประกันที่อายุนี้ (${rangeText(planAges(d,rd.plan))})</span>` : `<span class="rp">${money(v)} บาท/ปี</span>`;
-    return `<li><div><b>${d.name}</b><small>${d.th}</small></div>${price}<button type="button" class="rm" data-i="${i}" aria-label="ลบ ${d.name}">×</button><select id="rider-plan-${rd.id}" data-i="${i}" aria-label="แผนของ ${d.name}">${opts}</select></li>`;
+    const d=riderDef(rd.id);
+    const ctl = d.saCfg
+      ? `<div class="risa"><div class="numwrap"><input id="rider-sa-${rd.id}" class="ri-sa" data-i="${i}" type="text" inputmode="numeric" aria-label="ทุนประกันของ ${d.name} (บาท)"><em>บาท</em></div><input id="rider-range-${rd.id}" class="ri-range" data-i="${i}" type="range" min="0" max="1000" step="1" aria-label="เลื่อนเลือกทุนของ ${d.name}"><small>ทุน ${fmt0(d.saCfg.min)} – ${fmt0(d.saCfg.max)} บาท</small></div>`
+      : `<select id="rider-plan-${rd.id}" data-i="${i}" aria-label="แผนของ ${d.name}">${d.plans.map(pl=>`<option value="${pl.n}"${pl.n===rd.plan?' selected':''}>${planText(d,pl.n)}</option>`).join('')}</select>`;
+    return `<li><div><b>${d.name}</b><small>${d.th}</small></div><span class="rp" id="rider-price-${rd.id}"></span><button type="button" class="rm" data-i="${i}" aria-label="ลบ ${d.name}">×</button>${ctl}</li>`;
   }).join(''));
+  S.riders.forEach(rd=>{
+    const d=riderDef(rd.id), v=riderPrem(rd), el=$(`rider-price-${rd.id}`), [a,b]=planAges(d,rd.plan);
+    const off = v==null ? (S.age<a||S.age>b ? `ไม่รับประกันที่อายุนี้ (${rangeText([a,b])})` : `ทุนต้องอยู่ระหว่าง ${fmt0(d.saCfg.min)} – ${fmt0(d.saCfg.max)} บาท`) : '';
+    el.className = off ? 'rp off' : 'rp'; el.textContent = off || `${money(v)} บาท/ปี`;
+    if(d.saCfg){
+      const si=$(`rider-sa-${rd.id}`), sl=$(`rider-range-${rd.id}`);
+      if(document.activeElement!==si) si.value=isFinite(rd.sa)?fmt0(rd.sa):'';
+      si.parentElement.classList.toggle('bad', !saOk(d,rd.sa));
+      if(document.activeElement!==sl) sl.value=riderSaToPos(d.saCfg,rd.sa); paint(sl);
+    }
+  });
 }
 function setHTML(el,html){ if(el._html!==html){ el.innerHTML=html; el._html=html; } }
 
@@ -461,9 +488,20 @@ $('riderPlanPick').addEventListener('change',()=>render());
 $('riderAdd').addEventListener('click',()=>{
   const id=$('riderPick').value, plan=+$('riderPlanPick').value||1;
   if(!id || S.riders.some(x=>x.id===id)) return;
-  S.riders.push({id,plan}); syncGender(); render();
+  const d=riderDef(id); S.riders.push(d.saCfg ? {id,plan:1,sa:d.saCfg.def} : {id,plan}); syncGender(); render();
 });
 $('riderList').addEventListener('change',e=>{ if(e.target.matches('select')){ S.riders[+e.target.dataset.i].plan=+e.target.value; render(); } });
+$('riderList').addEventListener('input',e=>{
+  const t=e.target, rd=S.riders[+t.dataset.i]; if(!rd) return;
+  if(t.matches('.ri-range')){ rd.sa=riderPosToSa(riderDef(rd.id).saCfg,+t.value); render(); }
+  else if(t.matches('.ri-sa')){
+    const digits=t.value.replace(/[^\d]/g,''); rd.sa=digits?+digits:NaN;
+    const pos=t.selectionStart, before=t.value.length;
+    t.value=digits?fmt0(+digits):''; const d=t.value.length-before;
+    try{t.setSelectionRange(pos+d,pos+d);}catch(_){}
+    render(); }
+});
+$('riderList').addEventListener('focusout',e=>{ if(e.target.matches('.ri-sa,.ri-range')) setTimeout(render); });
 $('riderList').addEventListener('click',e=>{ const b=e.target.closest('.rm'); if(b){ S.riders.splice(+b.dataset.i,1); syncGender(); render(); } });
 $('gender').addEventListener('click',e=>{const b=e.target.closest('button'); if(b&&!b.disabled){S.g=b.dataset.g; render();}});
 $('terms').addEventListener('click',e=>{const b=e.target.closest('button'); if(!b) return;
