@@ -426,7 +426,6 @@ function render(){
       `เบี้ยแบบหลักรายปี: ${money(r.prem)} บาท`,
       ...rAdds.map(x=>`สัญญาเพิ่มเติม ${x.d.name} ${riderLabel(x.d,x.rd)}: ${money(x.v)} บาท/ปี`),
       ...(rAdds.length?[`เบี้ยรวมปีแรก: ${money(first)} บาท`]:[]),
-      `เบี้ยแบบหลักรวมตลอดสัญญา: ${money(r.total)} บาท`,
       `* ประมาณการจากอัตราเบี้ยมาตรฐาน เบี้ยจริงขึ้นกับการพิจารณารับประกัน`].join('\n');
     $('shLine').href = 'https://line.me/R/share?text=' + encodeURIComponent(shareMsg);
     $('shMail').href = 'mailto:?subject=' + encodeURIComponent(`สรุปเบี้ยประกัน ${p.name}`) + '&body=' + encodeURIComponent(shareMsg);
@@ -438,7 +437,7 @@ function render(){
     if(r.big) rows.push([`ส่วนลด ${p.legacyDisc[S.term]}% (ทุนตั้งแต่ 20 ล้าน)`,'−'+fmt2(r.base-r.rate),'neg']);
     if(r.d) rows.push(['ส่วนลดตามทุนประกัน / ทุน 1,000','−'+fmt2(r.d),'neg']);
     if(r.big||r.d) rows.push(['อัตราสุทธิ / ทุน 1,000',fmt2(r.net)]);
-    rows.push(['จำนวนปีที่ชำระเบี้ย',r.yrs+' ปี'],[rAdds.length?'เบี้ยแบบหลักรวมตลอดสัญญา':'เบี้ยรวมตลอดสัญญา',money(r.total)+' บาท']);
+    rows.push(['จำนวนปีที่ชำระเบี้ย',r.yrs+' ปี']);
     $('sDetail').innerHTML=rows.map(([k,v,c])=>`<dt>${k}</dt><dd${c?` class="${c}"`:''}>${v}</dd>`).join('');
     const many=p.terms.length>1; $('cmpBox').hidden=!many;
     if(many) $('cmp').innerHTML=p.terms.map(t=>{
@@ -451,7 +450,7 @@ function render(){
   if(p.legacyDisc) notes.push('ทุนตั้งแต่ 20 ล้านบาทใช้อัตราที่หักส่วนลดแล้วตามตารางในโบรชัวร์ ส่วนอัตราสุขภาพดีกว่ามาตรฐาน (Preferred) โบรชัวร์ไม่ได้ให้ตารางไว้ จึงยังไม่คำนวณ');
   if(p.id==='senior') notes.push('รวมทุกกรมธรรม์ไม่เกิน 200,000 บาทต่อราย ไม่ตรวจสุขภาพและไม่ต้องตอบคำถามสุขภาพ');
   if(p.id==='p65') notes.push('อัตราเบี้ยของแบบนี้เท่ากันทั้งชายและหญิง');
-  if(S.riders.length) notes.push('เบี้ยสัญญาเพิ่มเติมคิดตามช่วงอายุและต่ออายุปีต่อปี เบี้ยปีต่อไปจะเปลี่ยนตามอายุ จึงไม่รวมในเบี้ยรวมตลอดสัญญา');
+  if(S.riders.length) notes.push('เบี้ยสัญญาเพิ่มเติมคิดตามช่วงอายุและต่ออายุปีต่อปี เบี้ยปีต่อไปจะเปลี่ยนตามอายุ');
   if(!p.saMax) notes.push('โบรชัวร์ระบุเฉพาะทุนขั้นต่ำ แถบเลื่อนจึงไปถึง '+fmt0(p.sliderMax)+' บาท พิมพ์ทุนที่สูงกว่านี้ได้');
   $('sNotes').innerHTML=notes.map(n=>`<li>${n}</li>`).join('');
 }
