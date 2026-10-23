@@ -119,6 +119,15 @@ dd.neg{color:var(--accent)}
 .sh-copy{background:#1976d2;color:#fff}
 .sh:hover{filter:brightness(1.07)}
 .sh:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tint{--accent-soft:color-mix(in srgb,var(--accent) 10%,#fff);--track:color-mix(in srgb,var(--accent) 18%,#fff);--field:color-mix(in srgb,var(--accent) 4%,#fff);--line:color-mix(in srgb,var(--accent) 16%,#fff)}
+/* each picker gets its own colour */
+.c-plan{--accent:#d71920}.c-gender{--accent:#7c3aed}.c-term{--accent:#0f766e}.c-age{--accent:#c2410c}.c-sa{--accent:#1d4ed8}.c-rider{--accent:#15803d}
+.tint>.label{flex-wrap:wrap;row-gap:0}
+.tint>.label span:first-child{color:var(--accent);display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.tint>.label span:first-child::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.riders li{background:var(--accent-soft)}
+.riders li b{color:var(--accent)}
+.riders li .numwrap,.riders li select{background:#fff}
 footer{font-size:12.5px;color:var(--muted);max-width:80ch}
 @media (prefers-reduced-motion:no-preference){.big .v{transition:color .2s}}
 </style>
@@ -132,14 +141,14 @@ footer{font-size:12.5px;color:var(--muted);max-width:80ch}
 
   <div class="grid">
     <section class="panel" aria-label="ข้อมูลผู้เอาประกัน">
-      <div>
+      <div class="tint c-plan">
         <p class="label"><span>แบบประกัน</span></p>
         <select id="plans" class="planselect" aria-label="เลือกแบบประกัน"></select>
         <div class="plansub" id="planSub"></div>
       </div>
 
       <div class="row2">
-        <div>
+        <div class="tint c-gender">
           <p class="label"><span>เพศ</span></p>
           <div class="seg" id="gender" role="group" aria-label="เพศ">
             <button type="button" id="g-m" data-g="m" aria-pressed="true">ชาย</button>
@@ -147,20 +156,20 @@ footer{font-size:12.5px;color:var(--muted);max-width:80ch}
           </div>
           <div class="unisex" id="unisex" hidden>แบบนี้ใช้อัตราเดียวกันทั้งชายและหญิง</div>
         </div>
-        <div id="termBox">
+        <div id="termBox" class="tint c-term">
           <p class="label"><span>ระยะเวลาชำระเบี้ย</span></p>
           <div class="seg" id="terms" role="group" aria-label="ระยะเวลาชำระเบี้ย"></div>
         </div>
       </div>
 
-      <div class="field">
+      <div class="field tint c-age">
         <p class="label"><span>อายุผู้เอาประกัน</span><span id="ageRange"></span></p>
         <div class="numwrap" id="ageWrap"><input id="ageInput" type="number" inputmode="numeric" aria-label="อายุ (ปี)"><em id="ageUnit">ปี</em></div>
         <input id="ageSlider" type="range" step="1" aria-label="เลื่อนเลือกอายุ">
         <div class="ticks"><span id="ageLo"></span><span id="ageHi"></span></div>
       </div>
 
-      <div class="field">
+      <div class="field tint c-sa">
         <p class="label"><span>จำนวนเงินเอาประกัน (ทุนประกัน)</span><span id="saRange"></span></p>
         <div class="numwrap" id="saWrap"><input id="saInput" type="text" inputmode="numeric" aria-label="ทุนประกัน (บาท)"><em>บาท</em></div>
         <input id="saSlider" type="range" min="0" max="1000" step="1" aria-label="เลื่อนเลือกทุนประกัน">
@@ -168,7 +177,7 @@ footer{font-size:12.5px;color:var(--muted);max-width:80ch}
         <div class="chips" id="saChips"></div>
       </div>
 
-      <div class="field">
+      <div class="field tint c-rider">
         <p class="label"><span>สัญญาเพิ่มเติม</span><span id="riderHint"></span></p>
         <div class="rideradd">
           <select id="riderPick" class="planselect" aria-label="เลือกสัญญาเพิ่มเติม"></select>
@@ -254,46 +263,46 @@ function accMax(){ return Math.max(100000, Math.floor(6*(isFinite(S.sa)?S.sa:0)/
 /* Riders: flat annual premium by entry-age band and gender (Health Happy 07/2025, Health Saver 01/2026, Health Starter); CI Plus 07/2025 = rate per 1,000 x rider SA */
 function bandPremium(age,g,plan){const i=this.bands.findIndex(([a,b])=>age>=a&&age<=b); return i<0?null:this.rates[g][i][plan-1];}
 const RIDERS=[
- {id:'hh', name:'Health Happy', th:'ค่ารักษาพยาบาลแบบเหมาจ่าย', ages:[11,75],
+ {id:'hh', color:'#be185d', name:'Health Happy', th:'ค่ารักษาพยาบาลแบบเหมาจ่าย', ages:[11,75],
   plans:[{n:1,label:'แผน 1 · วงเงิน 1 ล้านบาท',room:'1,500'},{n:2,label:'แผน 2 · วงเงิน 5 ล้านบาท',room:'3,000'},{n:3,label:'แผน 3 · วงเงิน 15 ล้านบาท',room:'6,000'},{n:4,label:'แผน 4 · วงเงิน 25 ล้านบาท',room:'9,000'}],
   bands:[[11,15],[16,20],[21,25],[26,30],[31,35],[36,40],[41,45],[46,50],[51,55],[56,59],[60,65],[66,70],[71,75]],
   rates:{
    m:[[16400,20200,25500,33400],[13500,16500,20100,26200],[13700,16900,21600,28000],[14700,18300,26100,33800],[15100,18900,29400,37800],[17000,20800,31800,40900],[19200,23800,36000,47300],[21600,26700,40200,52400],[28300,35000,50100,65300],[34100,42300,63900,83000],[40900,50600,72300,94100],[59400,72100,105000,136700],[85400,104000,152100,197800]],
    f:[[14400,18200,21600,27900],[15200,19100,23100,30300],[17200,21500,27000,35300],[17500,21800,30600,38000],[18400,22700,34200,42300],[20400,25100,37200,46000],[22300,27800,42900,53600],[24500,30400,46500,60700],[28500,35200,50700,65500],[34400,42500,65100,84600],[41500,50800,73500,95700],[60800,74000,107100,139300],[88200,107500,155700,202000]]},
   premium(g,age,plan){return bandPremium.call(this,age,g,plan);}},
- {id:'hs', name:'Health Saver', th:'ค่ารักษาพยาบาลแบบเหมาจ่าย เบี้ยประหยัด', ages:[11,75],
+ {id:'hs', color:'#0f766e', name:'Health Saver', th:'ค่ารักษาพยาบาลแบบเหมาจ่าย เบี้ยประหยัด', ages:[11,75],
   plans:[{n:1,label:'แผน 200,000 บาท',room:'1,500'},{n:2,label:'แผน 300,000 บาท',room:'2,000'},{n:3,label:'แผน 400,000 บาท',room:'3,000'},{n:4,label:'แผน 500,000 บาท',room:'4,000'}],
   bands:[[11,15],[16,20],[21,25],[26,30],[31,35],[36,40],[41,45],[46,50],[51,55],[56,60],[61,65],[66,70],[71,75]],
   rates:{
    m:[[10100,12300,16400,20200],[7300,8700,10600,13700],[6900,8400,10400,13400],[7400,8900,13500,16600],[7500,9300,14700,18900],[8500,10200,15200,20100],[10000,11400,17100,21600],[11800,13000,18000,24700],[15400,17200,24300,30900],[20600,24200,30700,40500],[27300,31000,47000,56600],[37500,47100,65900,81000],[53700,67400,94400,115800]],
    f:[[8500,10500,14400,18200],[7400,9700,12000,15000],[8600,10600,14400,18100],[9100,11300,17100,21000],[9200,11700,18000,22700],[10400,11900,18500,25100],[12100,13800,21700,26500],[14300,16000,23200,29200],[15500,17200,25600,34100],[20800,24400,31000,40900],[27600,31300,47500,57200],[37900,47600,66600,81800],[54200,68100,95300,117000]]},
   premium(g,age,plan){return bandPremium.call(this,age,g,plan);}},
- {id:'st', name:'Health Starter', th:'ค่ารักษาพยาบาล เลือกแบบร่วมจ่ายได้', ages:[0,75],
+ {id:'st', color:'#4338ca', name:'Health Starter', th:'ค่ารักษาพยาบาล เลือกแบบร่วมจ่ายได้', ages:[0,75],
   plans:[{n:1,t:'begin',c:0,label:'แผน 1500 แบบ Begin',detail:'ร่วมจ่าย 10% รพ.ในเครือข่าย / 30% นอกเครือข่าย'},{n:2,t:'begin',c:1,label:'แผน 2000 แบบ Begin',detail:'ร่วมจ่าย 10% รพ.ในเครือข่าย / 30% นอกเครือข่าย'},{n:3,t:'begin',c:2,label:'แผน 2500 แบบ Begin',detail:'ร่วมจ่าย 10% รพ.ในเครือข่าย / 30% นอกเครือข่าย'},{n:4,t:'begin',c:3,label:'แผน 3500 แบบ Begin',detail:'ร่วมจ่าย 10% รพ.ในเครือข่าย / 30% นอกเครือข่าย'},{n:5,t:'begin',c:4,label:'แผน 4500 แบบ Begin',detail:'ร่วมจ่าย 10% รพ.ในเครือข่าย / 30% นอกเครือข่าย'},{n:6,t:'bal',c:0,ages:[11,75],label:'แผน 1500 แบบ Balanced',detail:'ไม่ร่วมจ่ายในเครือข่าย / ร่วมจ่าย 20% นอกเครือข่าย'},{n:7,t:'bal',c:1,ages:[11,75],label:'แผน 2000 แบบ Balanced',detail:'ไม่ร่วมจ่ายในเครือข่าย / ร่วมจ่าย 20% นอกเครือข่าย'},{n:8,t:'bal',c:2,ages:[11,75],label:'แผน 2500 แบบ Balanced',detail:'ไม่ร่วมจ่ายในเครือข่าย / ร่วมจ่าย 20% นอกเครือข่าย'},{n:9,t:'bal',c:3,ages:[11,75],label:'แผน 3500 แบบ Balanced',detail:'ไม่ร่วมจ่ายในเครือข่าย / ร่วมจ่าย 20% นอกเครือข่าย'},{n:10,t:'bal',c:4,ages:[11,75],label:'แผน 4500 แบบ Balanced',detail:'ไม่ร่วมจ่ายในเครือข่าย / ร่วมจ่าย 20% นอกเครือข่าย'}],
   tables:{
    begin:{bands:[[0,5],[6,10],[11,15],[16,20],[21,25],[26,30],[31,35],[36,40],[41,45],[46,50],[51,55],[56,60],[61,65],[66,70],[71,75]], m:[[32700,46200,55600,70500,86700],[17200,25100,28900,36400,43700],[8500,12900,15300,19300,23000],[3700,6300,7600,9800,11600],[3800,6400,7800,9900,11700],[4100,7000,8600,11100,13100],[4300,7300,9000,11700,13700],[4500,7700,9400,12100,14300],[4900,8200,10100,13000,15300],[5100,8600,10500,13500,15900],[7100,11900,14500,18700,22000],[9500,15600,19000,24400,28900],[13700,20900,25600,33000,39000],[19800,28700,35000,45300,55700],[29700,41100,50200,65200,77300]], f:[[32600,45900,53600,68000,83700],[16200,23700,27400,34300,41300],[7700,11900,14000,17600,21500],[3900,7100,8100,11000,13400],[4200,7700,9000,11900,14500],[4300,8200,9400,12400,15000],[4800,8300,10100,13400,15700],[5100,8600,10500,13700,16200],[5500,9200,11400,15000,17600],[5700,10000,12300,16200,19700],[7700,13000,16000,20700,24500],[10400,16700,20500,26700,31600],[15000,22500,27700,36200,42900],[21600,30900,38000,50000,59300],[32400,44600,54700,72200,85700]]},
    bal:{bands:[[11,15],[16,20],[21,25],[26,30],[31,35],[36,40],[41,45],[46,50],[51,55],[56,60],[61,65],[66,70],[71,75]], m:[[9400,14300,17000,21400,25500],[4100,7000,8400,10800,12800],[4200,7100,8600,11000,13000],[4500,7700,9500,12300,14500],[4700,8100,10000,12900,15200],[5000,8500,10400,13400,15800],[5400,9100,11200,14400,17000],[5600,9500,11600,14900,17600],[7800,13200,16100,20700,24400],[10500,17300,21100,27100,32100],[15200,23200,28400,36600,43300],[22000,31800,38800,50300,61800],[33000,45600,55700,72400,85800]], f:[[8500,13200,15500,19500,23800],[4300,7800,9000,12200,14800],[4600,8500,10000,13200,16100],[4700,9100,10400,13700,16600],[5300,9200,11200,14800,17400],[5600,9500,11600,15200,18000],[6100,10200,12600,16600,19500],[6200,11100,13600,18000,21800],[8500,14400,17700,23000,27200],[11500,18500,22700,29600,35100],[16600,25000,30700,40200,47600],[24000,34300,42200,55500,65800],[36000,49500,60700,80200,95200]]}},
   premium(g,age,n){const pl=this.plans[n-1],tb=this.tables[pl.t];const i=tb.bands.findIndex(([a,b])=>age>=a&&age<=b);return i<0?null:tb[g][i][pl.c];}},
- {id:'ci', name:'CI Plus', th:'คุ้มครองโรคร้ายแรง 44 โรค/การรักษา', ages:[0,75], saCfg:{min:100000,max:25000000,step:100000,def:1000000},
+ {id:'ci', color:'#b45309', name:'CI Plus', th:'คุ้มครองโรคร้ายแรง 44 โรค/การรักษา', ages:[0,75], saCfg:{min:100000,max:25000000,step:100000,def:1000000},
   bands:[[0,15],[16,20],[21,25],[26,30],[31,35],[36,40],[41,45],[46,50],[51,55],[56,60],[61,65],[66,70],[71,75]],
   rates:{m:[2.62,2.76,2.89,3.16,3.84,5.23,10.19,15.92,25.38,42.31,61.04,81.76,112.64], f:[2.27,2.06,2.15,2.55,3.53,4.6,6.38,10.17,15.92,26.09,35.81,51.71,73.52]},
   premium(g,age,_,sa){const i=this.bands.findIndex(([a,b])=>age>=a&&age<=b); return i<0?null:Math.round(this.rates[g][i]*sa/10)/100;}},
- {id:'hk', name:'Health Happy Kids', th:'ค่ารักษาพยาบาลแบบเหมาจ่าย สำหรับเด็ก', ages:[0,10],
+ {id:'hk', color:'#0369a1', name:'Health Happy Kids', th:'ค่ารักษาพยาบาลแบบเหมาจ่าย สำหรับเด็ก', ages:[0,10],
   saCfg:{min:1000000,max:25000000,snap:[1000000,5000000,15000000,25000000],def:1000000},
   plans:[{n:1,label:'ความรับผิดส่วนแรก 10,000 บาท',short:'ความรับผิดส่วนแรก 10,000'},{n:2,label:'ความรับผิดส่วนแรก 30,000 บาท',short:'ความรับผิดส่วนแรก 30,000'}],
   bands:[[0,5],[6,10]],
   rates:{1:{m:[[53500,73900,104700,143000],[28600,39400,58500,82500]], f:[[47600,64400,88500,123000],[24600,34500,47700,67900]]},
          2:{m:[[33500,53900,84600,123000],[14500,22400,40500,64500]], f:[[27600,44400,68400,103000],[11000,17500,29700,49900]]}},
   premium(g,age,n,sa){const i=this.bands.findIndex(([a,b])=>age>=a&&age<=b), j=this.saCfg.snap.indexOf(sa); return i<0||j<0?null:this.rates[n][g][i][j];}},
- {id:'ai', name:'AI/RCC', th:'อุบัติเหตุ คุ้มครองครบ + ชดเชยรายสัปดาห์', ages:[16,64],
+ {id:'ai', color:'#7e22ce', name:'AI/RCC', th:'อุบัติเหตุ คุ้มครองครบ + ชดเชยรายสัปดาห์', ages:[16,64],
   saCfg:{min:100000,step:100000,maxNote:' (ไม่เกิน 6 เท่าของทุนแบบหลัก)',get max(){return accMax();},get def(){return Math.min(1000000,this.max);}},
   plans:[{n:1,label:'ชั้นอาชีพ 1 · งานออฟฟิศ',short:'ชั้นอาชีพ 1'},{n:2,label:'ชั้นอาชีพ 2 · ออกนอกสถานที่',short:'ชั้นอาชีพ 2'},{n:3,label:'ชั้นอาชีพ 3 · งานช่าง/ใช้แรงงาน',short:'ชั้นอาชีพ 3'},{n:4,label:'ชั้นอาชีพ 4 · งานเสี่ยงภัย',short:'ชั้นอาชีพ 4'}],
   rates:[6.25,7.25,8.25,10.25],
   premium(g,age,n,sa){return Math.round(this.rates[n-1]*sa/10)/100;}},
- {id:'add', name:'ADD/RCC', th:'อุบัติเหตุ เสียชีวิต + สูญเสียอวัยวะ', ages:[0,64], ageLo:'1 เดือน',
+ {id:'add', color:'#15803d', name:'ADD/RCC', th:'อุบัติเหตุ เสียชีวิต + สูญเสียอวัยวะ', ages:[0,64], ageLo:'1 เดือน',
   saCfg:{min:100000,step:100000,maxNote:' (ไม่เกิน 6 เท่าของทุนแบบหลัก)',get max(){return accMax();},get def(){return Math.min(1000000,this.max);}},
   premium(g,age,_,sa){return Math.round((age<=15?3.25:2.75)*sa/10)/100;}},
- {id:'adb', name:'ADB/RCC', th:'อุบัติเหตุ เฉพาะกรณีเสียชีวิต', ages:[0,64],
+ {id:'adb', color:'#475569', name:'ADB/RCC', th:'อุบัติเหตุ เฉพาะกรณีเสียชีวิต', ages:[0,64],
   saCfg:{min:100000,step:100000,maxNote:' (ไม่เกิน 6 เท่าของทุนแบบหลัก)',get max(){return accMax();},get def(){return Math.min(1000000,this.max);}},
   premium(g,age,_,sa){return Math.round(2.75*sa/10)/100;}},
 ];
@@ -479,7 +488,7 @@ function renderRiders(){
     const ctl = d.saCfg
       ? sel+`<div class="risa"><div class="numwrap"><input id="rider-sa-${rd.id}" class="ri-sa" data-i="${i}" type="text" inputmode="numeric" aria-label="ทุนประกันของ ${d.name} (บาท)"><em>บาท</em></div><input id="rider-range-${rd.id}" class="ri-range" data-i="${i}" type="range" min="0" max="${d.saCfg.snap?d.saCfg.snap.length-1:1000}" step="1" aria-label="เลื่อนเลือกทุนของ ${d.name}"><small>${saRangeText(d.saCfg)}</small></div>`
       : sel;
-    return `<li><div><b>${d.name}</b><small>${d.th}</small></div><span class="rp" id="rider-price-${rd.id}"></span><button type="button" class="rm" data-i="${i}" aria-label="ลบ ${d.name}">×</button>${ctl}</li>`;
+    return `<li class="tint" style="--accent:${d.color}"><div><b>${d.name}</b><small>${d.th}</small></div><span class="rp" id="rider-price-${rd.id}"></span><button type="button" class="rm" data-i="${i}" aria-label="ลบ ${d.name}">×</button>${ctl}</li>`;
   }).join(''));
   S.riders.forEach(rd=>{
     const d=riderDef(rd.id), v=riderPrem(rd), el=$(`rider-price-${rd.id}`), [a,b]=planAges(d,rd.plan);
