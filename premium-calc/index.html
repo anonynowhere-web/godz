@@ -249,6 +249,8 @@ const PLANS = [
 ];
 
 let shareMsg = '';
+/* Accident riders (AI/ADD/ADB + RCC): rate per 1,000 from the user's summary sheet, SA up to 6x the main plan's SA */
+function accMax(){ return Math.max(100000, Math.floor(6*(isFinite(S.sa)?S.sa:0)/100000)*100000); }
 /* Riders: flat annual premium by entry-age band and gender (Health Happy 07/2025, Health Saver 01/2026, Health Starter); CI Plus 07/2025 = rate per 1,000 x rider SA */
 function bandPremium(age,g,plan){const i=this.bands.findIndex(([a,b])=>age>=a&&age<=b); return i<0?null:this.rates[g][i][plan-1];}
 const RIDERS=[
@@ -283,12 +285,23 @@ const RIDERS=[
   rates:{1:{m:[[53500,73900,104700,143000],[28600,39400,58500,82500]], f:[[47600,64400,88500,123000],[24600,34500,47700,67900]]},
          2:{m:[[33500,53900,84600,123000],[14500,22400,40500,64500]], f:[[27600,44400,68400,103000],[11000,17500,29700,49900]]}},
   premium(g,age,n,sa){const i=this.bands.findIndex(([a,b])=>age>=a&&age<=b), j=this.saCfg.snap.indexOf(sa); return i<0||j<0?null:this.rates[n][g][i][j];}},
+ {id:'ai', name:'AI/RCC', th:'อุบัติเหตุ คุ้มครองครบ + ชดเชยรายสัปดาห์', ages:[16,64],
+  saCfg:{min:100000,step:100000,maxNote:' (ไม่เกิน 6 เท่าของทุนแบบหลัก)',get max(){return accMax();},get def(){return Math.min(1000000,this.max);}},
+  plans:[{n:1,label:'ชั้นอาชีพ 1 · งานออฟฟิศ',short:'ชั้นอาชีพ 1'},{n:2,label:'ชั้นอาชีพ 2 · ออกนอกสถานที่',short:'ชั้นอาชีพ 2'},{n:3,label:'ชั้นอาชีพ 3 · งานช่าง/ใช้แรงงาน',short:'ชั้นอาชีพ 3'},{n:4,label:'ชั้นอาชีพ 4 · งานเสี่ยงภัย',short:'ชั้นอาชีพ 4'}],
+  rates:[5.50,7.25,9.50,13.50],
+  premium(g,age,n,sa){return Math.round(this.rates[n-1]*sa/10)/100;}},
+ {id:'add', name:'ADD/RCC', th:'อุบัติเหตุ เสียชีวิต + สูญเสียอวัยวะ', ages:[0,64], ageLo:'1 เดือน',
+  saCfg:{min:100000,step:100000,maxNote:' (ไม่เกิน 6 เท่าของทุนแบบหลัก)',get max(){return accMax();},get def(){return Math.min(1000000,this.max);}},
+  premium(g,age,_,sa){return Math.round((age<=15?2.00:1.50)*sa/10)/100;}},
+ {id:'adb', name:'ADB/RCC', th:'อุบัติเหตุ เฉพาะกรณีเสียชีวิต', ages:[0,60], ageLo:'1 เดือน',
+  saCfg:{min:100000,step:100000,maxNote:' (ไม่เกิน 6 เท่าของทุนแบบหลัก)',get max(){return accMax();},get def(){return Math.min(1000000,this.max);}},
+  premium(g,age,_,sa){return Math.round(1.50*sa/10)/100;}},
 ];
 const riderDef = id => RIDERS.find(x=>x.id===id);
 const planAges = (d,n) => (n && d.plans && d.plans[n-1] && d.plans[n-1].ages) || d.ages;
-const rangeText = ([a,b]) => `${a===0?'15 วัน':a}–${b} ปี`;
+const rangeText = ([a,b],d) => `${a===0?(d&&d.ageLo||'15 วัน'):a}–${b} ปี`;
 const saOk = (d,sa) => !d.saCfg || (d.saCfg.snap ? d.saCfg.snap.includes(sa) : isFinite(sa) && sa>=d.saCfg.min && sa<=d.saCfg.max);
-const saRangeText = c => c.snap ? `ทุนเลือกได้ ${c.snap.map(v=>fmt0(v/1e6)).join(' / ')} ล้านบาท` : `ทุน ${fmt0(c.min)} – ${fmt0(c.max)} บาท`;
+const saRangeText = c => c.snap ? `ทุนเลือกได้ ${c.snap.map(v=>fmt0(v/1e6)).join(' / ')} ล้านบาท` : `ทุน ${fmt0(c.min)} – ${fmt0(c.max)} บาท${c.maxNote||''}`;
 const snapSa = (c,sa) => !c.snap||!isFinite(sa) ? sa : c.snap.reduce((a,b)=>Math.abs(b-sa)<Math.abs(a-sa)?b:a);
 const riderPrem = rd => { const d=riderDef(rd.id), [a,b]=planAges(d,rd.plan); return (S.age>=a&&S.age<=b&&saOk(d,rd.sa)) ? d.premium(S.g,S.age,rd.plan,rd.sa) : null; };
 const riderSaToPos = (c,sa) => c.snap ? Math.max(0,c.snap.indexOf(snapSa(c,sa))) : Math.round(Math.sqrt(Math.max(0,Math.min(1,(sa-c.min)/(c.max-c.min))))*1000);
@@ -460,7 +473,7 @@ function renderRiders(){
   const ageOk = cur && S.age>=curAges[0] && S.age<=curAges[1];
   pick.closest('.rideradd').hidden=!free.length;
   pick.disabled=!free.length; pp.disabled=!cur; add.disabled=!cur||!ageOk;
-  $('riderHint').textContent = !free.length ? 'เพิ่มได้สัญญาละ 1 ครั้ง' : (cur && !ageOk ? `แผนนี้รับประกันอายุ ${rangeText(curAges)}` : 'เพิ่มได้สัญญาละ 1 ครั้ง');
+  $('riderHint').textContent = !free.length ? 'เพิ่มได้สัญญาละ 1 ครั้ง' : (cur && !ageOk ? `แผนนี้รับประกันอายุ ${rangeText(curAges,cur)}` : 'เพิ่มได้สัญญาละ 1 ครั้ง');
   setHTML($('riderList'), S.riders.map((rd,i)=>{
     const d=riderDef(rd.id);
     const sel = d.plans ? `<select id="rider-plan-${rd.id}" data-i="${i}" aria-label="แผนของ ${d.name}">${d.plans.map(pl=>`<option value="${pl.n}"${pl.n===rd.plan?' selected':''}>${d.saCfg?pl.label:planText(d,pl.n)}</option>`).join('')}</select>` : '';
@@ -471,7 +484,7 @@ function renderRiders(){
   }).join(''));
   S.riders.forEach(rd=>{
     const d=riderDef(rd.id), v=riderPrem(rd), el=$(`rider-price-${rd.id}`), [a,b]=planAges(d,rd.plan);
-    const off = v==null ? (S.age<a||S.age>b ? `ไม่รับประกันที่อายุนี้ (${rangeText([a,b])})` : (d.saCfg.snap ? saRangeText(d.saCfg) : `ทุนต้องอยู่ระหว่าง ${fmt0(d.saCfg.min)} – ${fmt0(d.saCfg.max)} บาท`)) : '';
+    const off = v==null ? (S.age<a||S.age>b ? `ไม่รับประกันที่อายุนี้ (${rangeText([a,b],d)})` : (d.saCfg.snap ? saRangeText(d.saCfg) : `ทุนต้องอยู่ระหว่าง ${fmt0(d.saCfg.min)} – ${fmt0(d.saCfg.max)} บาท`)) : '';
     el.className = off ? 'rp off' : 'rp'; el.textContent = off || `${money(v)} บาท/ปี`;
     if(d.saCfg){
       const si=$(`rider-sa-${rd.id}`), sl=$(`rider-range-${rd.id}`);
@@ -498,7 +511,7 @@ $('riderPlanPick').addEventListener('change',()=>render());
 $('riderAdd').addEventListener('click',()=>{
   const id=$('riderPick').value, plan=+$('riderPlanPick').value||1;
   if(!id || S.riders.some(x=>x.id===id)) return;
-  const d=riderDef(id); S.riders.push(d.saCfg ? {id,plan:1,sa:d.saCfg.def} : {id,plan}); syncGender(); render();
+  const d=riderDef(id); S.riders.push(d.saCfg ? {id,plan,sa:d.saCfg.def} : {id,plan}); syncGender(); render();
 });
 $('riderList').addEventListener('change',e=>{ if(e.target.matches('select')){ S.riders[+e.target.dataset.i].plan=+e.target.value; render(); } });
 $('riderList').addEventListener('input',e=>{
@@ -511,7 +524,7 @@ $('riderList').addEventListener('input',e=>{
     try{t.setSelectionRange(pos+d,pos+d);}catch(_){}
     render(); }
 });
-$('riderList').addEventListener('focusout',e=>{ const t=e.target; if(t.matches('.ri-sa,.ri-range')){ const rd=S.riders[+t.dataset.i]; if(rd) rd.sa=snapSa(riderDef(rd.id).saCfg,rd.sa); setTimeout(render); } });
+$('riderList').addEventListener('focusout',e=>{ const t=e.target; if(t.matches('.ri-sa,.ri-range')){ const rd=S.riders[+t.dataset.i]; if(rd){ rd.sa=snapSa(riderDef(rd.id).saCfg,rd.sa); if(t.matches('.ri-sa')) t.value=isFinite(rd.sa)?fmt0(rd.sa):''; } queueMicrotask(render); setTimeout(render); } });
 $('riderList').addEventListener('click',e=>{ const b=e.target.closest('.rm'); if(b){ S.riders.splice(+b.dataset.i,1); syncGender(); render(); } });
 $('gender').addEventListener('click',e=>{const b=e.target.closest('button'); if(b&&!b.disabled){S.g=b.dataset.g; render();}});
 $('terms').addEventListener('click',e=>{const b=e.target.closest('button'); if(!b) return;
