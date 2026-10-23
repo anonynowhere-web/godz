@@ -365,6 +365,10 @@ const RIDERS=[
   saCfg:{min:100000,step:100000,maxNote:' (ไม่เกิน 6 เท่าของทุนแบบหลัก)',list:true,get max(){return accMax();},get def(){return this.min;}},
   premium(g,age,_,sa){return Math.round(2.75*sa/10)/100;}},
 ];
+/* dropdown groups: [heading, ids] in display order */
+const PLAN_GROUPS=[['ประกันตลอดชีพ',['p20','p1015','plus','senior','p65']],['ประกันสะสมทรัพย์',['ss','lti','p5','end','exc']],['ประกันบำนาญ',['asure','afix']],['ประกันเพื่อส่งต่อมรดก (Legacy)',['legacy','lplus','lprot']]];
+const RIDER_GROUPS=[['ค่ารักษาพยาบาล',['hh','hs','st','hk']],['โรคร้ายแรง',['ci']],['อุบัติเหตุ',['ai','add','adb']]];
+const groupHTML=(groups,items,opt)=>groups.map(([h,ids])=>{ const xs=ids.map(id=>items.find(x=>x.id===id)).filter(Boolean); return xs.length?`<optgroup label="${h}">${xs.map(opt).join('')}</optgroup>`:''; }).join('');
 const riderDef = id => RIDERS.find(x=>x.id===id);
 const planAges = (d,n) => (n && d.plans && d.plans[n-1] && d.plans[n-1].ages) || d.ages;
 const rangeText = ([a,b],d) => `${a===0?(d&&d.ageLo||'15 วัน'):a}–${b} ปี`;
@@ -449,7 +453,7 @@ function validate(){
 
 function renderPlans(){
   const sel=$('plans');
-  if(!sel.options.length) sel.innerHTML = PLANS.map(p=>`<option value="${p.id}">${p.name} – ${p.thn}</option>`).join('');
+  if(!sel.options.length) sel.innerHTML = groupHTML(PLAN_GROUPS, PLANS, p=>`<option value="${p.id}">${p.name} – ${p.thn}</option>`);
   sel.value=S.plan.id;
   $('planSub').textContent=`${S.plan.th} · ${S.plan.cover}`;
 }
@@ -554,7 +558,7 @@ function renderRiders(){
   const free=RIDERS.filter(d=>!S.riders.some(x=>x.id===d.id));
   const pick=$('riderPick'), pp=$('riderPlanPick'), add=$('riderAdd');
   const keep=pick.value;
-  setHTML(pick, free.length ? free.map(d=>`<option value="${d.id}">${d.name} – ${d.th}</option>`).join('') : '<option value="">เพิ่มครบทุกสัญญาแล้ว</option>');
+  setHTML(pick, free.length ? groupHTML(RIDER_GROUPS, free, d=>`<option value="${d.id}">${d.name} – ${d.th}</option>`) : '<option value="">เพิ่มครบทุกสัญญาแล้ว</option>');
   if(free.some(d=>d.id===keep)) pick.value=keep;
   const cur=riderDef(pick.value);
   const keepPlan=pp.value;
