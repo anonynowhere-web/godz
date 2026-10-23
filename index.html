@@ -159,6 +159,7 @@ body{margin:0}
     <li>เบี้ยจริงขึ้นอยู่กับการพิจารณารับประกันและการตรวจสุขภาพของบริษัท</li>
     <li>Pay Life Plus ส่วนลด: ทุน 500,000–699,999 ลด 1.00 บาท, ตั้งแต่ 700,000 ลด 1.50 บาท ต่อทุน 1,000</li>
     <li>20Pay Life ส่วนลด: ทุน 250,000–599,999 ลด 1 บาท, ตั้งแต่ 600,000 ลด 2 บาท ต่อทุน 1,000</li>
+    <li>AIA HB Extra: อัตรามาตรฐานรายปีตามช่วงอายุ ต่อค่าชดเชย 100 บาท/วัน รับประกันอายุ 15 วัน–70 ปี (ต่ออายุถึง 79 ปี) บริษัทอาจปรับเบี้ยในปีต่ออายุ</li>
   </ul>
 </main>
 <div class="toast" id="toast" hidden></div>
@@ -251,8 +252,18 @@ const RIDERS = [
   {id:"hbx", name:"AIA HB Extra", plans:["1,000/วัน","2,000/วัน","3,000/วัน","4,000/วัน","5,000/วัน"], maxAge:70}
 ];
 // อัตราเบี้ยสัญญาเพิ่มเติม: RIDER_RATES[id](sex, age, plan) → เบี้ยรายปี หรือ null ถ้ายังไม่มีตาราง
-const RIDER_RATES = {};
-const riderPrem = r => { const f = RIDER_RATES[r.type]; const v = f ? f(st.sex, st.age, r.plan) : null; return v == null ? null : v; };
+// AIA HB Extra: อัตราเบี้ยมาตรฐานรายปีต่อค่าชดเชยรายวัน 100 บาท (โบรชัวร์ SU0215400)
+// [อายุสูงสุดของช่วง, ชาย, หญิง] — 71–79 เป็นอัตราปีต่ออายุ
+const HBX = [[20,360,325],[35,210,280],[40,230,290],[45,250,320],[50,290,370],[55,350,400],[60,420,460],[65,510,490],[70,710,600],[75,910,710],[79,1140,840]];
+const RIDER_RATES = {
+  hbx: (sex, age, plan) => {
+    const band = HBX.find(b => age <= b[0]); if (!band) return null;
+    const daily = +plan.replace(/[^\d]/g, "");
+    return band[sex === "M" ? 1 : 2] * daily / 100;
+  }
+};
+const riderOk = r => { const d = RIDERS.find(x => x.id === r.type); return !d.maxAge || st.age <= d.maxAge; };
+const riderPrem = r => { if (!riderOk(r)) return null; const f = RIDER_RATES[r.type]; const v = f ? f(st.sex, st.age, r.plan) : null; return v == null ? null : v; };
 const riders = [];
 let rid = 0;
 function riderRow(r){
@@ -325,7 +336,8 @@ function render(typing){
     const m = MODES["12"];
     riders.forEach(x => x.prem = riderPrem(x));
     const active = riders.filter(x => x.prem != null);
-    const pending = riders.filter(x => x.prem == null);
+    const pending = riders.filter(x => x.prem == null && riderOk(x));
+    const over = riders.filter(x => !riderOk(x));
     const rSum = Math.round(active.reduce((a, x) => a + x.prem, 0) * 100) / 100;
     const total = Math.round((r.prem + rSum) * 100) / 100;
     const mp = Math.round(total * m.f * 100) / 100;
@@ -338,6 +350,7 @@ function render(typing){
        <dt>เบี้ยแบบหลักรายปี</dt><dd>${fmt2(r.prem)} บาท</dd>` +
       active.map(x => `<dt>${esc(riderName(x))}</dt><dd>${fmt2(x.prem)} บาท</dd>`).join("") +
       pending.map(x => `<dt>${esc(riderName(x))}</dt><dd>รอตารางเบี้ย</dd>`).join("") +
+      over.map(x => `<dt>${esc(riderName(x))}</dt><dd>เกินอายุรับประกัน</dd>`).join("") +
       (active.length ? `<dt>รวมเบี้ยรายปี</dt><dd>${fmt2(total)} บาท</dd>` : "") +
       (m.f === 1 ? "" : `<dt>เบี้ย${m.t} (รายปี × ${m.f})</dt><dd>${fmt2(mp)} บาท</dd>`);
     shareText = `ใบเสนอเบี้ยประกัน\n${sexTxt(st.sex)} อายุ ${ageTxt(st.age)}\n${p.full}\nทุนประกัน ${fmt(st.sa)} บาท\nเบี้ยแบบหลัก ${fmt2(r.prem)} บาท/ปี\n${active.map(x => `+ ${riderName(x)} ${fmt2(x.prem)} บาท/ปี\n`).join("")}${pending.map(x => `+ ${riderName(x)} (เบี้ยรอยืนยัน)\n`).join("")}${active.length ? `รวมเบี้ยรายปี ${fmt2(total)} บาท\n` : ""}${m.f === 1 ? "" : `เบี้ย${m.t} ${fmt2(mp)} บาท\n`}(อัตรามาตรฐาน ขึ้นอยู่กับการพิจารณารับประกันของบริษัท)`;
