@@ -68,6 +68,15 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
 .chips{display:flex;gap:6px;flex-wrap:wrap}
 .chips button{all:unset;cursor:pointer;font-size:12.5px;font-family:var(--mono);border:1px solid var(--line);border-radius:999px;padding:3px 10px;color:var(--muted)}
 .chips button:hover{border-color:var(--accent);color:var(--ink)}
+.tiers{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:6px}
+.tiers button{all:unset;box-sizing:border-box;cursor:pointer;display:grid;gap:1px;border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:12px;color:var(--muted);line-height:1.35}
+.tiers button b{font-weight:600;color:var(--ink);font-size:12.5px}
+.tiers button:hover{border-color:var(--accent)}
+.tiers button.on{border-color:var(--accent);background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+.tiers button.on b{color:var(--accent)}
+.tiers button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.discnow{font-size:13px;color:var(--accent);font-weight:500}
+.discnow:empty{display:none}
 .rideradd{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center}
 .rideradd #riderPick{grid-column:1/-1}
 .rideradd .planselect{font-size:14.5px;padding:9px 10px}
@@ -186,6 +195,8 @@ footer{font-size:12.5px;color:var(--muted);max-width:80ch}
         <input id="saSlider" type="range" min="0" max="1000" step="1" aria-label="เลื่อนเลือกทุนประกัน">
         <div class="ticks"><span id="saLo"></span><span id="saHi"></span></div>
         <div class="chips" id="saChips"></div>
+        <div class="tiers" id="saTiers" role="group" aria-label="อัตราส่วนลดตามทุนประกัน"></div>
+        <div class="discnow" id="saDisc"></div>
       </div>
 
       <div class="field tint c-rider">
@@ -250,15 +261,15 @@ const money = n => Number.isInteger(Math.round(n*100)/100) ? fmt0(n) : fmt2(n);
 const PLANS = [
  {id:'p20', name:'20 Pay Life (Non Par)', thn:'ตลอดชีพ ชำระเบี้ยประกันภัย 20 ปี (ไม่มีเงินปันผล)', th:'ตลอดชีพ ชำระเบี้ย 20 ปี', cover:'คุ้มครองถึงอายุ 99 ปี',
   ages:[0,70], terms:[20], saMin:100000, saMax:null, sliderMax:20000000, rows:R.p20,
-  col:(t,s)=>s==='m'?0:1, disc:sa=> sa>=600000?2 : sa>=250000?1 : 0,
+  col:(t,s)=>s==='m'?0:1, disc:sa=> sa>=600000?2 : sa>=250000?1 : 0, tiers:[[250000,1],[600000,2]],
   discNote:'ส่วนลด 1 บาท/1,000 เมื่อทุน 250,000–599,999 และ 2 บาท/1,000 เมื่อทุนตั้งแต่ 600,000', chips:[100000,500000,1000000,5000000]},
  {id:'p1015', name:'10&15 Pay Life (Non Par)', thn:'ตลอดชีพ ชำระเบี้ยประกันภัย 10 ปี และ 15 ปี (ไม่มีเงินปันผล)', th:'ตลอดชีพ ชำระเบี้ย 10 หรือ 15 ปี', cover:'คุ้มครองถึงอายุ 99 ปี',
   ages:[0,65], terms:[10,15], saMin:300000, saMax:9999999, rows:R.p1015,
-  col:(t,s)=>(t===10?0:2)+(s==='m'?0:1), disc:sa=> sa>=500000?1:0,
+  col:(t,s)=>(t===10?0:2)+(s==='m'?0:1), disc:sa=> sa>=500000?1:0, tiers:[[500000,1]],
   discNote:'ส่วนลด 1 บาท/1,000 เมื่อทุนตั้งแต่ 500,000', chips:[300000,500000,1000000,5000000]},
  {id:'plus', name:'Pay Life Plus (Non Par)', thn:'เพย์ ไลฟ์ พลัส (ไม่มีเงินปันผล)', th:'ตลอดชีพ พลัส ชำระเบี้ย 10, 15 หรือ 20 ปี', cover:'คุ้มครองถึงอายุ 99 ปี',
   ages:[0,75], terms:[10,15,20], saMin:t=>t===20?150000:300000, saMax:9999999, rows:R.plus,
-  col:(t,s)=>({10:0,15:2,20:4})[t]+(s==='m'?0:1), disc:sa=> sa>=700000?1.5 : sa>=500000?1 : 0,
+  col:(t,s)=>({10:0,15:2,20:4})[t]+(s==='m'?0:1), disc:sa=> sa>=700000?1.5 : sa>=500000?1 : 0, tiers:[[500000,1],[700000,1.5]],
   discNote:'ส่วนลด 1 บาท/1,000 เมื่อทุน 500,000–699,999 และ 1.50 บาท/1,000 เมื่อทุนตั้งแต่ 700,000', chips:[300000,500000,1000000,5000000]},
  {id:'senior', name:'Senior Happy', thn:'ซีเนียร์ แฮปปี้', th:'ตลอดชีพ 90/90 สำหรับผู้สูงอายุ', cover:'ชำระเบี้ยและคุ้มครองถึงอายุ 90 ปี ไม่ตรวจสุขภาพ',
   ages:[50,70], terms:['to90'], saMin:50000, saMax:200000, rows:R.senior,
@@ -375,6 +386,30 @@ function calc(p,t,g,age,sa){
   return {base, rate, d, net, prem, yrs, total:prem*yrs, big};
 }
 
+/* SA-band discount tiers shown under the SA picker */
+function tiersOf(p){
+  const lo=saMinOf(p,S.term);
+  if(p.legacyDisc) return [{from:lo,to:19999999,txt:'ไม่มีส่วนลด'},{from:20000000,to:null,txt:`ลด ${p.legacyDisc[S.term]}% จากอัตราเบี้ย`}];
+  if(!p.tiers) return [];
+  const t=[[lo,0],...p.tiers.filter(([f])=>f>lo)];
+  return t.map(([f,d],i)=>({from:f,to:t[i+1]?t[i+1][0]-1:null,txt:d?`ลด ${fmt2(d)} บาท/ทุน 1,000`:'ไม่มีส่วนลด'}));
+}
+function renderTiers(p,r){
+  const t=tiersOf(p), sa=S.sa;
+  const amt = n => n>=1e6 ? fmt0(n/1e6)+' ล้าน' : fmt0(n);
+  setHTML($('saTiers'), t.map(x=>`<button type="button" data-sa="${x.from}"><span>ทุน ${x.to?(x.to>=1e6?`${amt(x.from)} – ไม่ถึง ${amt(x.to+1)}`:`${amt(x.from)}–${amt(x.to)}`):`${amt(x.from)} ขึ้นไป`}</span><b>${x.txt}</b></button>`).join(''));
+  [...$('saTiers').children].forEach((b,i)=>b.classList.toggle('on', isFinite(sa) && sa>=t[i].from && (t[i].to==null || sa<=t[i].to)));
+  $('saTiers').hidden=!t.length;
+  let msg='แบบนี้ไม่มีส่วนลดตามทุนประกัน';
+  if(t.length && r){
+    const save = r.big ? (r.base-r.rate)*sa/1000 : r.d*sa/1000;
+    const next = t.find(x=>x.from>sa);
+    msg = save>0 ? `ได้ส่วนลด ${money(Math.round(save*100)/100)} บาท/ปี` : 'ทุนนี้ยังไม่ได้ส่วนลด';
+    if(next) msg += ` · เพิ่มทุนเป็น ${fmt0(next.from)} บาท ได้${next.txt}`;
+  } else if(t.length) msg='';
+  $('saDisc').textContent=msg;
+}
+
 function validate(){
   const p=S.plan, lo=saMinOf(p,S.term); const errs=[];
   if(!(S.age>=p.ages[0] && S.age<=p.ages[1])) errs.push(`อายุที่รับประกันของแบบนี้คือ ${ageText(p.ages[0])} – ${p.ages[1]} ปี`);
@@ -436,6 +471,7 @@ function render(){
   $('saWrap').classList.toggle('bad', errs.some(e=>e.startsWith('ทุน')));
   $('msg').hidden=!errs.length; $('msg').textContent=errs.join(' · ');
   const r = errs.length ? null : calc(p,S.term,S.g,S.age,S.sa);
+  renderTiers(p,r);
   renderRiders();
   const rAdds = S.riders.map(rd=>({rd, d:riderDef(rd.id), v:riderPrem(rd)})).filter(x=>x.v!=null);
   const rSum = rAdds.reduce((a,x)=>a+x.v,0);
@@ -568,6 +604,7 @@ $('saInput').addEventListener('input',e=>{
   try{e.target.setSelectionRange(pos+d,pos+d);}catch(_){}
   render();});
 $('saInput').addEventListener('blur',()=>render());
+$('saTiers').addEventListener('click',e=>{const b=e.target.closest('button'); if(b){S.sa=+b.dataset.sa; render();}});
 $('saChips').addEventListener('click',e=>{const b=e.target.closest('button'); if(b){S.sa=+b.dataset.sa; render();}});
 
 $('shCopy').addEventListener('click',()=>{
