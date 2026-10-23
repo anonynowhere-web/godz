@@ -89,10 +89,11 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
 .riders small{color:var(--muted);font-size:12.5px;display:block;line-height:1.4}
 .riders .rp{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:14px;text-align:right;white-space:nowrap}
 .rideradd .sanote{color:var(--muted);font-size:13px}
+.riders .ri-hint{grid-column:1/-1;margin-top:-4px}
 .riders .risa{grid-column:1/-1;display:grid;gap:4px}
 .riders .risa .numwrap{max-width:220px}
 .riders .risa .numwrap input{font-size:15px;padding:7px 0}
-.riders .rp.off{color:var(--warn);font-family:var(--body);font-size:12.5px;white-space:normal}
+.riders .rp.off{color:var(--warn);font-family:var(--body);font-size:12.5px;white-space:normal;text-align:left;grid-column:1/-1;grid-row:2}
 .riders select{grid-column:1/-1;width:100%;max-width:100%;font:inherit;font-size:13px;padding:4px 6px;border:1px solid var(--line);border-radius:7px;background:var(--field);color:var(--ink)}
 .rm{all:unset;cursor:pointer;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;color:var(--muted);font-size:18px;line-height:1}
 .rm:hover{background:var(--accent-soft);color:var(--accent)}
@@ -290,6 +291,7 @@ const PLANS = [
 
 let shareMsg = '';
 /* Accident riders (AI/ADD/ADB + RCC): rate per 1,000 incl. RCC 1.25, from the user's summary sheet rev1 (AI matches the AIA manual table quoted by agents); SA up to 6x the main plan's SA */
+function accOptions(max){ const o=[]; for(let v=100000; v<=max; v+= v<1e6?100000 : v<5e6?500000 : v<1e7?1e6 : v<5e7?5e6 : 1e7) o.push(v); return o; }
 function accMax(){ return Math.max(100000, Math.floor(6*(isFinite(S.sa)?S.sa:0)/100000)*100000); }
 /* Riders: flat annual premium by entry-age band and gender (Health Happy 07/2025, Health Saver 01/2026, Health Starter); CI Plus 07/2025 = rate per 1,000 x rider SA */
 function bandPremium(age,g,plan){const i=this.bands.findIndex(([a,b])=>age>=a&&age<=b); return i<0?null:this.rates[g][i][plan-1];}
@@ -326,15 +328,15 @@ const RIDERS=[
          2:{m:[[33500,53900,84600,123000],[14500,22400,40500,64500]], f:[[27600,44400,68400,103000],[11000,17500,29700,49900]]}},
   premium(g,age,n,sa){const i=this.bands.findIndex(([a,b])=>age>=a&&age<=b), j=this.saCfg.snap.indexOf(sa); return i<0||j<0?null:this.rates[n][g][i][j];}},
  {id:'ai', color:'#7e22ce', name:'AI/RCC', th:'อุบัติเหตุ คุ้มครองครบ + ชดเชยรายสัปดาห์', ages:[16,64],
-  saCfg:{min:100000,step:100000,maxNote:' (ไม่เกิน 6 เท่าของทุนแบบหลัก)',get max(){return accMax();},get def(){return this.min;}},
+  saCfg:{min:100000,step:100000,maxNote:' (ไม่เกิน 6 เท่าของทุนแบบหลัก)',list:true,get max(){return accMax();},get def(){return this.min;}},
   plans:[{n:1,label:'ชั้นอาชีพ 1 · งานออฟฟิศ',short:'ชั้นอาชีพ 1'},{n:2,label:'ชั้นอาชีพ 2 · ออกนอกสถานที่',short:'ชั้นอาชีพ 2'},{n:3,label:'ชั้นอาชีพ 3 · งานช่าง/ใช้แรงงาน',short:'ชั้นอาชีพ 3'},{n:4,label:'ชั้นอาชีพ 4 · งานเสี่ยงภัย',short:'ชั้นอาชีพ 4'}],
   rates:[6.25,7.25,8.25,10.25],
   premium(g,age,n,sa){return Math.round(this.rates[n-1]*sa/10)/100;}},
  {id:'add', color:'#15803d', name:'ADD/RCC', th:'อุบัติเหตุ เสียชีวิต + สูญเสียอวัยวะ', ages:[0,64], ageLo:'1 เดือน',
-  saCfg:{min:100000,step:100000,maxNote:' (ไม่เกิน 6 เท่าของทุนแบบหลัก)',get max(){return accMax();},get def(){return this.min;}},
+  saCfg:{min:100000,step:100000,maxNote:' (ไม่เกิน 6 เท่าของทุนแบบหลัก)',list:true,get max(){return accMax();},get def(){return this.min;}},
   premium(g,age,_,sa){return Math.round((age<=15?3.25:2.75)*sa/10)/100;}},
  {id:'adb', color:'#475569', name:'ADB/RCC', th:'อุบัติเหตุ เฉพาะกรณีเสียชีวิต', ages:[0,64],
-  saCfg:{min:100000,step:100000,maxNote:' (ไม่เกิน 6 เท่าของทุนแบบหลัก)',get max(){return accMax();},get def(){return this.min;}},
+  saCfg:{min:100000,step:100000,maxNote:' (ไม่เกิน 6 เท่าของทุนแบบหลัก)',list:true,get max(){return accMax();},get def(){return this.min;}},
   premium(g,age,_,sa){return Math.round(2.75*sa/10)/100;}},
 ];
 const riderDef = id => RIDERS.find(x=>x.id===id);
@@ -541,7 +543,9 @@ function renderRiders(){
   setHTML($('riderList'), S.riders.map((rd,i)=>{
     const d=riderDef(rd.id);
     const sel = d.plans ? `<select id="rider-plan-${rd.id}" data-i="${i}" aria-label="แผนของ ${d.name}">${d.plans.map(pl=>`<option value="${pl.n}"${pl.n===rd.plan?' selected':''}>${d.saCfg?pl.label:planText(d,pl.n)}</option>`).join('')}</select>` : '';
-    const ctl = d.saCfg
+    const ctl = d.saCfg && d.saCfg.list
+      ? sel+`<select id="rider-sadd-${rd.id}" class="ri-sadd" data-i="${i}" aria-label="ทุนประกันของ ${d.name}"></select><small class="ri-hint">${saRangeText(d.saCfg)}</small>`
+      : d.saCfg
       ? sel+`<div class="risa"><div class="numwrap"><input id="rider-sa-${rd.id}" class="ri-sa" data-i="${i}" type="text" inputmode="numeric" aria-label="ทุนประกันของ ${d.name} (บาท)"><em>บาท</em></div><input id="rider-range-${rd.id}" class="ri-range" data-i="${i}" type="range" min="0" max="${d.saCfg.snap?d.saCfg.snap.length-1:1000}" step="1" aria-label="เลื่อนเลือกทุนของ ${d.name}"><small>${saRangeText(d.saCfg)}</small></div>`
       : sel;
     return `<li class="tint" style="--sc:${d.color}"><div><b>${d.name}</b><small>${d.th}</small></div><span class="rp" id="rider-price-${rd.id}"></span><button type="button" class="rm" data-i="${i}" aria-label="ลบ ${d.name}">×</button>${ctl}</li>`;
@@ -550,7 +554,11 @@ function renderRiders(){
     const d=riderDef(rd.id), v=riderPrem(rd), el=$(`rider-price-${rd.id}`), [a,b]=planAges(d,rd.plan);
     const off = v==null ? (S.age<a||S.age>b ? `ไม่รับประกันที่อายุนี้ (${rangeText([a,b],d)})` : (d.saCfg.snap ? saRangeText(d.saCfg) : `ทุนต้องอยู่ระหว่าง ${fmt0(d.saCfg.min)} – ${fmt0(d.saCfg.max)} บาท`)) : '';
     el.className = off ? 'rp off' : 'rp'; el.textContent = off || `${money(v)} บาท/ปี`;
-    if(d.saCfg){
+    if(d.saCfg && d.saCfg.list){
+      const opts=accOptions(d.saCfg.max); if(isFinite(rd.sa) && !opts.includes(rd.sa)) opts.push(rd.sa);
+      setHTML($(`rider-sadd-${rd.id}`), opts.sort((a,b)=>a-b).map(v=>`<option value="${v}">ทุน ${fmt0(v)} บาท</option>`).join(''));
+      $(`rider-sadd-${rd.id}`).value=String(rd.sa);
+    } else if(d.saCfg){
       const si=$(`rider-sa-${rd.id}`), sl=$(`rider-range-${rd.id}`);
       if(document.activeElement!==si) si.value=isFinite(rd.sa)?fmt0(rd.sa):'';
       si.parentElement.classList.toggle('bad', !saOk(d,rd.sa));
@@ -577,7 +585,7 @@ $('riderAdd').addEventListener('click',()=>{
   if(!id || S.riders.some(x=>x.id===id)) return;
   const d=riderDef(id); S.riders.push(d.saCfg ? {id,plan,sa:d.saCfg.def} : {id,plan}); syncGender(); render();
 });
-$('riderList').addEventListener('change',e=>{ if(e.target.matches('select')){ S.riders[+e.target.dataset.i].plan=+e.target.value; render(); } });
+$('riderList').addEventListener('change',e=>{ if(e.target.matches('.ri-sadd')){ S.riders[+e.target.dataset.i].sa=+e.target.value; render(); } else if(e.target.matches('select')){ S.riders[+e.target.dataset.i].plan=+e.target.value; render(); } });
 $('riderList').addEventListener('input',e=>{
   const t=e.target, rd=S.riders[+t.dataset.i]; if(!rd) return;
   if(t.matches('.ri-range')){ rd.sa=riderPosToSa(riderDef(rd.id).saCfg,+t.value); render(); }
