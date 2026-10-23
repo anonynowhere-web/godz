@@ -195,7 +195,6 @@ footer{font-size:12.5px;color:var(--muted);max-width:80ch}
         <div class="numwrap" id="saWrap"><input id="saInput" type="text" inputmode="numeric" aria-label="ทุนประกัน (บาท)"><em>บาท</em></div>
         <input id="saSlider" type="range" min="0" max="1000" step="1" aria-label="เลื่อนเลือกทุนประกัน">
         <div class="ticks"><span id="saLo"></span><span id="saHi"></span></div>
-        <div class="chips" id="saChips"></div>
         <div class="tiers" id="saTiers" role="group" aria-label="อัตราส่วนลดตามทุนประกัน"></div>
         <div class="discnow" id="saDisc"></div>
       </div>
@@ -439,7 +438,6 @@ function setupRanges(){
   const lo=saMinOf(p,S.term);
   $('saLo').textContent=fmt0(lo); $('saHi').textContent=fmt0(saTopOf(p))+(p.saMax?'':'+');
   $('saRange').textContent = p.saMax ? `${fmt0(lo)} – ${fmt0(p.saMax)} บาท` : `ขั้นต่ำ ${fmt0(lo)} บาท`;
-  $('saChips').innerHTML = p.chips.map(c=>`<button type="button" data-sa="${c}">${c>=1e6?fmt0(c/1e6)+' ล้าน':fmt0(c)}</button>`).join('');
   const one=p.terms.length===1;
   $('termBox').querySelector('.label span').textContent = one ? 'ระยะเวลาชำระเบี้ย' : 'ระยะเวลาชำระเบี้ย';
   $('unisex').hidden=!p.unisex;
@@ -613,7 +611,6 @@ $('saInput').addEventListener('input',e=>{
   render();});
 $('saInput').addEventListener('blur',()=>render());
 $('saTiers').addEventListener('click',e=>{const b=e.target.closest('button'); if(b){S.sa=+b.dataset.sa; render();}});
-$('saChips').addEventListener('click',e=>{const b=e.target.closest('button'); if(b){S.sa=+b.dataset.sa; render();}});
 
 $('shCopy').addEventListener('click',()=>{
   const b=$('shCopy'), done=t=>{b.textContent=t; setTimeout(()=>b.textContent='คัดลอกข้อความ',1800);};
