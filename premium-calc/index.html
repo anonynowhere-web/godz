@@ -68,6 +68,21 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
 .chips{display:flex;gap:6px;flex-wrap:wrap}
 .chips button{all:unset;cursor:pointer;font-size:12.5px;font-family:var(--mono);border:1px solid var(--line);border-radius:999px;padding:3px 10px;color:var(--muted)}
 .chips button:hover{border-color:var(--accent);color:var(--ink)}
+.rideradd{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) auto;gap:8px;align-items:center}
+@media (max-width:520px){.rideradd{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.rideradd .addbtn{grid-column:1/-1}}
+.rideradd .planselect{font-size:14.5px;padding:9px 10px}
+.addbtn{all:unset;box-sizing:border-box;cursor:pointer;text-align:center;padding:10px 16px;border-radius:10px;background:var(--accent);color:var(--accent-ink);font-weight:600;white-space:nowrap}
+.addbtn:disabled{cursor:not-allowed;opacity:.4}
+.addbtn:focus-visible,.rm:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.riders{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.riders li{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:center;border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;padding:10px 10px 10px 12px}
+.riders b{font-family:var(--display);font-weight:600;font-size:14.5px;display:block;line-height:1.35}
+.riders small{color:var(--muted);font-size:12.5px;display:block;line-height:1.4}
+.riders .rp{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:14px;text-align:right;white-space:nowrap}
+.riders .rp.off{color:var(--warn);font-family:var(--body);font-size:12.5px;white-space:normal}
+.riders select{grid-column:1/-1;width:100%;max-width:100%;font:inherit;font-size:13px;padding:4px 6px;border:1px solid var(--line);border-radius:7px;background:var(--field);color:var(--ink)}
+.rm{all:unset;cursor:pointer;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;color:var(--muted);font-size:18px;line-height:1}
+.rm:hover{background:var(--accent-soft);color:var(--accent)}
 .msg{font-size:13px;color:var(--warn);background:var(--warn-soft);border-radius:8px;padding:8px 10px}
 /* slip */
 .slip{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px)}
@@ -149,6 +164,16 @@ footer{font-size:12.5px;color:var(--muted);max-width:80ch}
         <div class="chips" id="saChips"></div>
       </div>
 
+      <div class="field">
+        <p class="label"><span>สัญญาเพิ่มเติม</span><span id="riderHint"></span></p>
+        <div class="rideradd">
+          <select id="riderPick" class="planselect" aria-label="เลือกสัญญาเพิ่มเติม"></select>
+          <select id="riderPlanPick" class="planselect" aria-label="เลือกแผนของสัญญาเพิ่มเติม"></select>
+          <button type="button" id="riderAdd" class="addbtn">+ เพิ่ม</button>
+        </div>
+        <ul class="riders" id="riderList"></ul>
+      </div>
+
       <div class="msg" id="msg" hidden></div>
     </section>
 
@@ -158,7 +183,7 @@ footer{font-size:12.5px;color:var(--muted);max-width:80ch}
         <div class="sub" id="sSub"></div>
       </div>
       <div class="big">
-        <span class="k">เบี้ยประกันรายปี</span>
+        <span class="k" id="sPremK">เบี้ยประกันรายปี</span>
         <span class="v" id="sPrem">–</span>
         <span class="daily" id="sDaily"></span>
       </div>
@@ -219,7 +244,20 @@ const PLANS = [
 ];
 
 let shareMsg = '';
-const S = {plan:PLANS[0], g:'m', term:20, age:35, sa:1000000};
+/* Health Happy: annual premium by entry-age band (brochure 07/2025), plans 1-4, entry age 11-75 */
+const HH_BANDS=[[11,15],[16,20],[21,25],[26,30],[31,35],[36,40],[41,45],[46,50],[51,55],[56,59],[60,65],[66,70],[71,75]];
+const RIDERS=[
+ {id:'hh', name:'Health Happy', th:'ค่ารักษาพยาบาลแบบเหมาจ่าย', ages:[11,75],
+  plans:[{n:1,limit:'1 ล้าน',room:'1,500'},{n:2,limit:'5 ล้าน',room:'3,000'},{n:3,limit:'15 ล้าน',room:'6,000'},{n:4,limit:'25 ล้าน',room:'9,000'}],
+  rates:{
+   m:[[16400,20200,25500,33400],[13500,16500,20100,26200],[13700,16900,21600,28000],[14700,18300,26100,33800],[15100,18900,29400,37800],[17000,20800,31800,40900],[19200,23800,36000,47300],[21600,26700,40200,52400],[28300,35000,50100,65300],[34100,42300,63900,83000],[40900,50600,72300,94100],[59400,72100,105000,136700],[85400,104000,152100,197800]],
+   f:[[14400,18200,21600,27900],[15200,19100,23100,30300],[17200,21500,27000,35300],[17500,21800,30600,38000],[18400,22700,34200,42300],[20400,25100,37200,46000],[22300,27800,42900,53600],[24500,30400,46500,60700],[28500,35200,50700,65500],[34400,42500,65100,84600],[41500,50800,73500,95700],[60800,74000,107100,139300],[88200,107500,155700,202000]]},
+  premium(g,age,plan){const i=HH_BANDS.findIndex(([a,b])=>age>=a&&age<=b); return i<0?null:this.rates[g][i][plan-1];}},
+];
+const riderDef = id => RIDERS.find(x=>x.id===id);
+const riderPrem = rd => { const d=riderDef(rd.id); return (S.age>=d.ages[0]&&S.age<=d.ages[1]) ? d.premium(S.g,S.age,rd.plan) : null; };
+const planText = (d,n) => { const pl=d.plans[n-1]; return `แผน ${n} · วงเงิน ${pl.limit} บาท/ปี · ค่าห้อง ${pl.room}/วัน`; };
+const S = {plan:PLANS[0], g:'m', term:20, age:35, sa:1000000, riders:[]};
 const $ = id => document.getElementById(id);
 const saMinOf = (p,t) => typeof p.saMin==='function' ? p.saMin(t) : p.saMin;
 const saTopOf = p => p.saMax ?? p.sliderMax;
@@ -287,7 +325,12 @@ function setupRanges(){
   const one=p.terms.length===1;
   $('termBox').querySelector('.label span').textContent = one ? 'ระยะเวลาชำระเบี้ย' : 'ระยะเวลาชำระเบี้ย';
   $('unisex').hidden=!p.unisex;
-  ['g-m','g-f'].forEach(id=>$(id).disabled=!!p.unisex);
+  syncGender();
+}
+function syncGender(){
+  const lock=!!S.plan.unisex && !S.riders.length;
+  ['g-m','g-f'].forEach(id=>$(id).disabled=lock);
+  $('unisex').hidden=!lock;
 }
 
 function render(){
@@ -300,41 +343,50 @@ function render(){
   const si=$('saInput'), ss=$('saSlider');
   if(document.activeElement!==si) si.value=isFinite(S.sa)?fmt0(S.sa):'';
   ss.value=saToPos(S.sa); paint(ss);
-  ['g-m','g-f'].forEach(id=>$(id).setAttribute('aria-pressed', String(!p.unisex && $(id).dataset.g===S.g)));
+  ['g-m','g-f'].forEach(id=>$(id).setAttribute('aria-pressed', String((!p.unisex||S.riders.length>0) && $(id).dataset.g===S.g)));
   document.querySelectorAll('#terms button').forEach(b=>b.setAttribute('aria-pressed', String(String(S.term)===b.dataset.t)));
 
   // slip
   $('sName').textContent=p.name;
-  const gtxt = p.unisex ? 'ชาย/หญิง' : (S.g==='m'?'ชาย':'หญิง');
+  const gtxt = (p.unisex && !S.riders.length) ? 'ชาย/หญิง' : (S.g==='m'?'ชาย':'หญิง');
   $('sSub').textContent=`${gtxt} · อายุ ${ageText(S.age)} · ชำระเบี้ย ${termLabel(S.term)} · ${p.cover}`;
   const errs=validate();
   $('ageWrap').classList.toggle('bad', errs.some(e=>e.startsWith('อายุ')));
   $('saWrap').classList.toggle('bad', errs.some(e=>e.startsWith('ทุน')));
   $('msg').hidden=!errs.length; $('msg').textContent=errs.join(' · ');
   const r = errs.length ? null : calc(p,S.term,S.g,S.age,S.sa);
+  renderRiders();
+  const rAdds = S.riders.map(rd=>({rd, d:riderDef(rd.id), v:riderPrem(rd)})).filter(x=>x.v!=null);
+  const rSum = rAdds.reduce((a,x)=>a+x.v,0);
+  $('sPremK').textContent = rAdds.length ? 'เบี้ยรวมปีแรก (แบบหลัก + สัญญาเพิ่มเติม)' : 'เบี้ยประกันรายปี';
   if(!r){
     $('sPrem').innerHTML='–'; $('shareBox').hidden=true; $('sDaily').textContent='ปรับอายุหรือทุนประกันให้อยู่ในเงื่อนไขของแบบนี้';
     $('sDetail').innerHTML=''; $('cmp').innerHTML=''; $('cmpBox').hidden=true;
   } else {
-    $('sPrem').innerHTML=`${money(r.prem)}<small>บาท</small>`;
-    const gx = p.unisex ? 'ชาย/หญิง' : (S.g==='m'?'ชาย':'หญิง');
+    const first=r.prem+rSum;
+    $('sPrem').innerHTML=`${money(first)}<small>บาท</small>`;
+    const gx = gtxt;
     shareMsg = [`สรุปเบี้ยประกัน (Anonynowhere)`,
       `แบบ: ${p.name} – ${p.th}`,
       `ผู้เอาประกัน: ${gx} อายุ ${ageText(S.age)}`,
       `ทุนประกัน: ${fmt0(S.sa)} บาท`,
       `ชำระเบี้ย: ${termLabel(S.term)}${typeof S.term==='number'?'':` (${r.yrs} ปี)`}`,
-      `เบี้ยประกันรายปี: ${money(r.prem)} บาท`,
-      `เบี้ยรวมตลอดสัญญา: ${money(r.total)} บาท`,
+      `เบี้ยแบบหลักรายปี: ${money(r.prem)} บาท`,
+      ...rAdds.map(x=>`สัญญาเพิ่มเติม ${x.d.name} แผน ${x.rd.plan}: ${money(x.v)} บาท/ปี`),
+      ...(rAdds.length?[`เบี้ยรวมปีแรก: ${money(first)} บาท`]:[]),
+      `เบี้ยแบบหลักรวมตลอดสัญญา: ${money(r.total)} บาท`,
       `* ประมาณการจากอัตราเบี้ยมาตรฐาน เบี้ยจริงขึ้นกับการพิจารณารับประกัน`].join('\n');
     $('shLine').href = 'https://line.me/R/share?text=' + encodeURIComponent(shareMsg);
     $('shMail').href = 'mailto:?subject=' + encodeURIComponent(`สรุปเบี้ยประกัน ${p.name}`) + '&body=' + encodeURIComponent(shareMsg);
     $('shareBox').hidden=false;
-    $('sDaily').textContent=`เฉลี่ยวันละ ${fmt2(r.prem/365)} บาท`;
-    const rows=[['ทุนประกัน',fmt0(S.sa)+' บาท'],['อัตราเบี้ยมาตรฐาน / ทุน 1,000',fmt2(r.base)]];
+    $('sDaily').textContent=`เฉลี่ยวันละ ${fmt2(first/365)} บาท`;
+    const rows=[];
+    if(rAdds.length){ rows.push(['เบี้ยแบบหลัก / ปี',money(r.prem)+' บาท']); rAdds.forEach(x=>rows.push([`${x.d.name} แผน ${x.rd.plan} / ปี`,money(x.v)+' บาท'])); }
+    rows.push(['ทุนประกัน',fmt0(S.sa)+' บาท'],['อัตราเบี้ยมาตรฐาน / ทุน 1,000',fmt2(r.base)]);
     if(r.big) rows.push([`ส่วนลด ${p.legacyDisc[S.term]}% (ทุนตั้งแต่ 20 ล้าน)`,'−'+fmt2(r.base-r.rate),'neg']);
     if(r.d) rows.push(['ส่วนลดตามทุนประกัน / ทุน 1,000','−'+fmt2(r.d),'neg']);
     if(r.big||r.d) rows.push(['อัตราสุทธิ / ทุน 1,000',fmt2(r.net)]);
-    rows.push(['จำนวนปีที่ชำระเบี้ย',r.yrs+' ปี'],['เบี้ยรวมตลอดสัญญา',money(r.total)+' บาท']);
+    rows.push(['จำนวนปีที่ชำระเบี้ย',r.yrs+' ปี'],[rAdds.length?'เบี้ยแบบหลักรวมตลอดสัญญา':'เบี้ยรวมตลอดสัญญา',money(r.total)+' บาท']);
     $('sDetail').innerHTML=rows.map(([k,v,c])=>`<dt>${k}</dt><dd${c?` class="${c}"`:''}>${v}</dd>`).join('');
     const many=p.terms.length>1; $('cmpBox').hidden=!many;
     if(many) $('cmp').innerHTML=p.terms.map(t=>{
@@ -347,8 +399,31 @@ function render(){
   if(p.legacyDisc) notes.push('ทุนตั้งแต่ 20 ล้านบาทใช้อัตราที่หักส่วนลดแล้วตามตารางในโบรชัวร์ ส่วนอัตราสุขภาพดีกว่ามาตรฐาน (Preferred) โบรชัวร์ไม่ได้ให้ตารางไว้ จึงยังไม่คำนวณ');
   if(p.id==='senior') notes.push('รวมทุกกรมธรรม์ไม่เกิน 200,000 บาทต่อราย ไม่ตรวจสุขภาพและไม่ต้องตอบคำถามสุขภาพ');
   if(p.id==='p65') notes.push('อัตราเบี้ยของแบบนี้เท่ากันทั้งชายและหญิง');
+  if(S.riders.length) notes.push('เบี้ยสัญญาเพิ่มเติมคิดตามช่วงอายุและต่ออายุปีต่อปี เบี้ยปีต่อไปจะเปลี่ยนตามอายุ จึงไม่รวมในเบี้ยรวมตลอดสัญญา');
   if(!p.saMax) notes.push('โบรชัวร์ระบุเฉพาะทุนขั้นต่ำ แถบเลื่อนจึงไปถึง '+fmt0(p.sliderMax)+' บาท พิมพ์ทุนที่สูงกว่านี้ได้');
   $('sNotes').innerHTML=notes.map(n=>`<li>${n}</li>`).join('');
+}
+
+function renderRiders(){
+  const free=RIDERS.filter(d=>!S.riders.some(x=>x.id===d.id));
+  const pick=$('riderPick'), pp=$('riderPlanPick'), add=$('riderAdd');
+  const keep=pick.value;
+  pick.innerHTML = free.length ? free.map(d=>`<option value="${d.id}">${d.name} – ${d.th}</option>`).join('') : '<option value="">เพิ่มครบทุกสัญญาแล้ว</option>';
+  if(free.some(d=>d.id===keep)) pick.value=keep;
+  const cur=riderDef(pick.value);
+  const keepPlan=pp.value;
+  pp.innerHTML = cur ? cur.plans.map(pl=>`<option value="${pl.n}">แผน ${pl.n} · วงเงิน ${pl.limit}</option>`).join('') : '<option value="">–</option>';
+  if(cur && keepPlan) pp.value=keepPlan;
+  const ageOk = cur && S.age>=cur.ages[0] && S.age<=cur.ages[1];
+  pick.closest('.rideradd').hidden=!free.length;
+  pick.disabled=!free.length; pp.disabled=!cur; add.disabled=!cur||!ageOk;
+  $('riderHint').textContent = !free.length ? 'เพิ่มได้สัญญาละ 1 ครั้ง' : (cur && !ageOk ? `รับประกันอายุ ${cur.ages[0]}–${cur.ages[1]} ปี` : 'เพิ่มได้สัญญาละ 1 ครั้ง');
+  $('riderList').innerHTML = S.riders.map((rd,i)=>{
+    const d=riderDef(rd.id), v=riderPrem(rd);
+    const opts=d.plans.map(pl=>`<option value="${pl.n}"${pl.n===rd.plan?' selected':''}>${planText(d,pl.n)}</option>`).join('');
+    const price = v==null ? `<span class="rp off">ไม่รับประกันที่อายุนี้ (${d.ages[0]}–${d.ages[1]} ปี)</span>` : `<span class="rp">${money(v)} บาท/ปี</span>`;
+    return `<li><div><b>${d.name}</b><small>${d.th}</small></div>${price}<button type="button" class="rm" data-i="${i}" aria-label="ลบ ${d.name}">×</button><select id="rider-plan-${rd.id}" data-i="${i}" aria-label="แผนของ ${d.name}">${opts}</select></li>`;
+  }).join('');
 }
 
 function selectPlan(id){
@@ -361,6 +436,14 @@ function selectPlan(id){
 }
 
 $('plans').addEventListener('change',e=>selectPlan(e.target.value));
+$('riderPick').addEventListener('change',()=>{ $('riderPlanPick').value=''; render(); });
+$('riderAdd').addEventListener('click',()=>{
+  const id=$('riderPick').value, plan=+$('riderPlanPick').value||1;
+  if(!id || S.riders.some(x=>x.id===id)) return;
+  S.riders.push({id,plan}); syncGender(); render();
+});
+$('riderList').addEventListener('change',e=>{ if(e.target.matches('select')){ S.riders[+e.target.dataset.i].plan=+e.target.value; render(); } });
+$('riderList').addEventListener('click',e=>{ const b=e.target.closest('.rm'); if(b){ S.riders.splice(+b.dataset.i,1); syncGender(); render(); } });
 $('gender').addEventListener('click',e=>{const b=e.target.closest('button'); if(b&&!b.disabled){S.g=b.dataset.g; render();}});
 $('terms').addEventListener('click',e=>{const b=e.target.closest('button'); if(!b) return;
   const t=b.dataset.t; S.term=isNaN(+t)?t:+t; setupRanges(); render();});
