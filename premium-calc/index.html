@@ -331,7 +331,7 @@ let shareMsg = '';
 /* Accident riders (AI/ADD/ADB + RCC): rate per 1,000 incl. RCC 1.25, from the user's summary sheet rev1 (AI matches the AIA manual table quoted by agents); SA up to 6x the main plan's SA */
 function accOptions(max){ const o=[]; for(let v=100000; v<=max; v+= v<1e6?100000 : v<5e6?500000 : v<1e7?1e6 : v<5e7?5e6 : 1e7) o.push(v); return o; }
 function accMax(){ return Math.max(100000, Math.floor(6*(isFinite(S.sa)?S.sa:0)/100000)*100000); }
-/* Riders: flat annual premium by entry-age band and gender (Health Happy 07/2025, Health Saver 01/2026, Health Starter); CI Plus 07/2025 = rate per 1,000 x rider SA */
+/* Riders: flat annual premium by entry-age band and gender (Health Happy 07/2025, Health Saver 01/2026, Health Starter); CI Plus 07/2025 = rate per 1,000 x rider SA; Care for Cancer 07/2025 = rate per 100,000 x rider SA */
 function bandPremium(age,g,plan){const i=this.bands.findIndex(([a,b])=>age>=a&&age<=b); return i<0?null:this.rates[g][i][plan-1];}
 const RIDERS=[
  {id:'hh', color:'#be185d', name:'Health Happy', th:'ค่ารักษาพยาบาลแบบเหมาจ่าย', ages:[11,75],
@@ -358,6 +358,10 @@ const RIDERS=[
   bands:[[0,15],[16,20],[21,25],[26,30],[31,35],[36,40],[41,45],[46,50],[51,55],[56,60],[61,65],[66,70],[71,75]],
   rates:{m:[2.62,2.76,2.89,3.16,3.84,5.23,10.19,15.92,25.38,42.31,61.04,81.76,112.64], f:[2.27,2.06,2.15,2.55,3.53,4.6,6.38,10.17,15.92,26.09,35.81,51.71,73.52]},
   premium(g,age,_,sa){const i=this.bands.findIndex(([a,b])=>age>=a&&age<=b); return i<0?null:Math.round(this.rates[g][i]*sa/10)/100;}},
+ {id:'cc', color:'#9f1239', name:'Care for Cancer', th:'คุ้มครองโรคมะเร็งทุกระยะ + ชดเชยรายวัน', ages:[0,70], saCfg:{min:100000,max:10000000,step:100000,def:100000},
+  bands:[[0,15],[16,20],[21,25],[26,30],[31,35],[36,40],[41,45],[46,50],[51,55],[56,60],[61,65],[66,70]],
+  rates:{m:[119.51,135.16,155.84,189.26,253.51,386.81,512.13,800.92,1282.87,1869.36,2876.04,4676.21], f:[119.51,139.33,182.5,253.4,375.68,462.17,669.69,921.1,1247.1,1774.95,2115.73,3143.33]},
+  premium(g,age,_,sa){const i=this.bands.findIndex(([a,b])=>age>=a&&age<=b); return i<0?null:Math.round(this.rates[g][i]*sa/1000)/100;}},
  {id:'hk', color:'#0369a1', name:'Health Happy Kids', th:'ค่ารักษาพยาบาลแบบเหมาจ่าย สำหรับเด็ก', ages:[0,10],
   saCfg:{min:1000000,max:25000000,snap:[1000000,5000000,15000000,25000000],def:1000000},
   plans:[{n:1,label:'ความรับผิดส่วนแรก 10,000 บาท',short:'ความรับผิดส่วนแรก 10,000'},{n:2,label:'ความรับผิดส่วนแรก 30,000 บาท',short:'ความรับผิดส่วนแรก 30,000'}],
@@ -379,7 +383,7 @@ const RIDERS=[
 ];
 /* dropdown groups: [heading, ids] in display order */
 const PLAN_GROUPS=[['ประกันตลอดชีพ',['p20','p1015','plus','senior','p65']],['ประกันสะสมทรัพย์',['ss','lti','p5','end','exc']],['ประกันบำนาญ',['asure','afix']],['ประกันเพื่อส่งต่อมรดก (Legacy)',['legacy','lplus','lprot']]];
-const RIDER_GROUPS=[['ค่ารักษาพยาบาล',['hh','hs','st','hk']],['โรคร้ายแรง',['ci']],['อุบัติเหตุ',['ai','add','adb']]];
+const RIDER_GROUPS=[['ค่ารักษาพยาบาล',['hh','hs','st','hk']],['โรคร้ายแรง',['ci','cc']],['อุบัติเหตุ',['ai','add','adb']]];
 const groupHTML=(groups,items,opt)=>groups.map(([h,ids])=>{ const xs=ids.map(id=>items.find(x=>x.id===id)).filter(Boolean); return xs.length?`<optgroup label="${h}">${xs.map(opt).join('')}</optgroup>`:''; }).join('');
 const riderDef = id => RIDERS.find(x=>x.id===id);
 const planAges = (d,n) => (n && d.plans && d.plans[n-1] && d.plans[n-1].ages) || d.ages;
