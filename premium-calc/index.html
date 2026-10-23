@@ -249,7 +249,7 @@ const PLANS = [
 ];
 
 let shareMsg = '';
-/* Accident riders (AI/ADD/ADB + RCC): rate per 1,000 from the user's summary sheet, SA up to 6x the main plan's SA */
+/* Accident riders (AI/ADD/ADB + RCC): rate per 1,000 incl. RCC 1.25, from the user's summary sheet rev1 (AI matches the AIA manual table quoted by agents); SA up to 6x the main plan's SA */
 function accMax(){ return Math.max(100000, Math.floor(6*(isFinite(S.sa)?S.sa:0)/100000)*100000); }
 /* Riders: flat annual premium by entry-age band and gender (Health Happy 07/2025, Health Saver 01/2026, Health Starter); CI Plus 07/2025 = rate per 1,000 x rider SA */
 function bandPremium(age,g,plan){const i=this.bands.findIndex(([a,b])=>age>=a&&age<=b); return i<0?null:this.rates[g][i][plan-1];}
@@ -288,14 +288,14 @@ const RIDERS=[
  {id:'ai', name:'AI/RCC', th:'อุบัติเหตุ คุ้มครองครบ + ชดเชยรายสัปดาห์', ages:[16,64],
   saCfg:{min:100000,step:100000,maxNote:' (ไม่เกิน 6 เท่าของทุนแบบหลัก)',get max(){return accMax();},get def(){return Math.min(1000000,this.max);}},
   plans:[{n:1,label:'ชั้นอาชีพ 1 · งานออฟฟิศ',short:'ชั้นอาชีพ 1'},{n:2,label:'ชั้นอาชีพ 2 · ออกนอกสถานที่',short:'ชั้นอาชีพ 2'},{n:3,label:'ชั้นอาชีพ 3 · งานช่าง/ใช้แรงงาน',short:'ชั้นอาชีพ 3'},{n:4,label:'ชั้นอาชีพ 4 · งานเสี่ยงภัย',short:'ชั้นอาชีพ 4'}],
-  rates:[5.50,7.25,9.50,13.50],
+  rates:[6.25,7.25,8.25,10.25],
   premium(g,age,n,sa){return Math.round(this.rates[n-1]*sa/10)/100;}},
  {id:'add', name:'ADD/RCC', th:'อุบัติเหตุ เสียชีวิต + สูญเสียอวัยวะ', ages:[0,64], ageLo:'1 เดือน',
   saCfg:{min:100000,step:100000,maxNote:' (ไม่เกิน 6 เท่าของทุนแบบหลัก)',get max(){return accMax();},get def(){return Math.min(1000000,this.max);}},
-  premium(g,age,_,sa){return Math.round((age<=15?2.00:1.50)*sa/10)/100;}},
- {id:'adb', name:'ADB/RCC', th:'อุบัติเหตุ เฉพาะกรณีเสียชีวิต', ages:[0,60], ageLo:'1 เดือน',
+  premium(g,age,_,sa){return Math.round((age<=15?3.25:2.75)*sa/10)/100;}},
+ {id:'adb', name:'ADB/RCC', th:'อุบัติเหตุ เฉพาะกรณีเสียชีวิต', ages:[0,64],
   saCfg:{min:100000,step:100000,maxNote:' (ไม่เกิน 6 เท่าของทุนแบบหลัก)',get max(){return accMax();},get def(){return Math.min(1000000,this.max);}},
-  premium(g,age,_,sa){return Math.round(1.50*sa/10)/100;}},
+  premium(g,age,_,sa){return Math.round(2.75*sa/10)/100;}},
 ];
 const riderDef = id => RIDERS.find(x=>x.id===id);
 const planAges = (d,n) => (n && d.plans && d.plans[n-1] && d.plans[n-1].ages) || d.ages;
