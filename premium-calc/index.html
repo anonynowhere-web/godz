@@ -207,6 +207,7 @@ input[type=range]::-moz-range-thumb{width:24px;height:24px;border-width:4px}
 .slip dl>*{padding:10px 0}
 .tiersum li{border-color:transparent;background:color-mix(in srgb,var(--accent) 6%,var(--surface));border-radius:12px;padding:8px 12px}
 .msg{border-radius:14px}
+.tiersum li b small,.tiers button small{display:block;font-weight:400;font-size:11.5px;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -528,18 +529,26 @@ const grossOf = r => r ? Math.round(r.base*S.sa/1000*100)/100 : 0;
 const saveText = r => { const y=grossOf(r)-r.prem; return `ประหยัดได้ ${money(y)} บาท/ปี รวม ${money(y*r.yrs)} บาท ตลอด ${r.yrs} ปีที่ชำระเบี้ย`; };
 const tierSave = r => r ? Math.round((r.big ? (r.base-r.rate)*S.sa/1000 : r.d*S.sa/1000)*100)/100 : 0;
 /* summary of every discount tier, marking the one that applies */
+/* tier discount as baht/year: at the current SA for the tier it is in, at the tier's starting SA otherwise */
+const tierOn = x => S.sa>=x.from && (x.to==null || S.sa<=x.to);
+function tierBaht(p,x){
+  const sa=tierOn(x)?S.sa:x.from, r=calc(p,S.term,S.g,S.age,sa); if(!r) return x.txt;
+  const d=Math.round((r.base*sa/1000-r.prem)*100)/100;
+  return d>0.004 ? `ลด ${money(d)} บาท/ปี${tierOn(x)?'':' ขึ้นไป'}` : 'ไม่มีส่วนลด';
+}
+const tierRate = x => x.txt==='ไม่มีส่วนลด' ? '' : x.txt.replace(/^ลด /,'');
 function tierSummary(p,r){
   const t=tiersOf(p);
   if(!t.length) return {html:'<p class="tiersum-h">ส่วนลดตามทุนประกัน</p><p class="tiersum-none">แบบนี้ไม่มีส่วนลดตามทุนประกัน</p>', text:['ส่วนลดตามทุนประกัน: แบบนี้ไม่มีส่วนลด']};
   const on=x=>S.sa>=x.from && (x.to==null || S.sa<=x.to), save=tierSave(r);
   return {
-    html:`<p class="tiersum-h">ส่วนลดตามทุนประกัน</p><ul class="tiersum">${t.map(x=>`<li class="${on(x)?'on':''}"><span>${tierRange(x)}</span><b>${x.txt}${on(x)?' ✓':''}</b></li>`).join('')}</ul><p class="tiersum-save">${save>0?`ก่อนส่วนลด ${money(grossOf(r))} − ส่วนลด ${money(grossOf(r)-r.prem)} = หลังส่วนลด ${money(r.prem)} บาท/ปี<br><b>${saveText(r)}</b>`:'ทุนนี้ยังไม่ได้ส่วนลด'}</p>`,
-    text:[['ส่วนลดตามทุนประกัน:', ...t.map(x=>`• ${tierRange(x)}: ${x.txt}${on(x)?' ✓ (ระดับที่ได้)':''}`)].join('\n'), save>0?saveText(r):'ทุนนี้ยังไม่ได้ส่วนลด']
+    html:`<p class="tiersum-h">ส่วนลดตามทุนประกัน</p><ul class="tiersum">${t.map(x=>`<li class="${on(x)?'on':''}"><span>${tierRange(x)}</span><b>${tierBaht(p,x)}${on(x)?' ✓':''}<small>${tierRate(x)}</small></b></li>`).join('')}</ul><p class="tiersum-save">${save>0?`ก่อนส่วนลด ${money(grossOf(r))} − ส่วนลด ${money(grossOf(r)-r.prem)} = หลังส่วนลด ${money(r.prem)} บาท/ปี<br><b>${saveText(r)}</b>`:'ทุนนี้ยังไม่ได้ส่วนลด'}</p>`,
+    text:[['ส่วนลดตามทุนประกัน:', ...t.map(x=>`• ${tierRange(x)}: ${tierBaht(p,x)}${tierRate(x)?` (${tierRate(x)})`:''}${on(x)?' ✓ (ระดับที่ได้)':''}`)].join('\n'), save>0?saveText(r):'ทุนนี้ยังไม่ได้ส่วนลด']
   };
 }
 function renderTiers(p,r){
   const t=tiersOf(p), sa=S.sa;
-  setHTML($('saTiers'), t.map(x=>`<button type="button" data-sa="${x.from}"><span>${tierRange(x)}</span><b>${x.txt}</b></button>`).join(''));
+  setHTML($('saTiers'), t.map(x=>`<button type="button" data-sa="${x.from}"><span>${tierRange(x)}</span><b>${tierBaht(p,x)}</b><small>${tierRate(x)}</small></button>`).join(''));
   [...$('saTiers').children].forEach((b,i)=>b.classList.toggle('on', isFinite(sa) && sa>=t[i].from && (t[i].to==null || sa<=t[i].to)));
   $('saTiers').hidden=!t.length;
   let msg='แบบนี้ไม่มีส่วนลดตามทุนประกัน';
@@ -547,7 +556,7 @@ function renderTiers(p,r){
     const save = tierSave(r);
     const next = t.find(x=>x.from>sa);
     msg = save>0 ? `ได้ส่วนลด ${money(save)} บาท/ปี` : 'ทุนนี้ยังไม่ได้ส่วนลด';
-    if(next) msg += ` · เพิ่มทุนเป็น ${fmt0(next.from)} บาท ได้${next.txt}`;
+    if(next) msg += ` · เพิ่มทุนเป็น ${fmt0(next.from)} บาท ได้${tierBaht(p,next).replace(' ขึ้นไป','')}`;
   } else if(t.length) msg='';
   $('saDisc').textContent=msg;
 }
