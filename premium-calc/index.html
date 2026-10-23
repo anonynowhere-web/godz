@@ -4,7 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <style>[hidden]{display:none!important}img{max-width:100%}body{margin:0}</style>
-<title>เครื่องคำนวณเบี้ยประกันชีวิต</title>
+<title>Anony</title>
+<link rel="icon" type="image/svg+xml" href="../20pln/icon.svg">
+<link rel="apple-touch-icon" href="../20pln/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anuphan:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
@@ -29,6 +31,10 @@ body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15p
 .wrap{max-width:1080px;margin:0 auto;display:grid;gap:24px}
 header h1{font-family:var(--display);font-weight:700;font-size:clamp(24px,4vw,32px);line-height:1.25;margin:0;text-wrap:balance}
 header p{margin:6px 0 0;color:var(--muted);max-width:62ch}
+.brand{display:flex;align-items:center;gap:14px}
+.brand-mark{width:52px;height:52px;flex:none;border-radius:15px;box-shadow:0 6px 18px -6px rgba(255,46,126,.55)}
+.brand h1{background:linear-gradient(100deg,#ff2e7e 0%,#ff6a3d 55%,#ffb321 100%);-webkit-background-clip:text;background-clip:text;color:transparent;letter-spacing:-.01em}
+@media (prefers-reduced-motion:no-preference){.brand-mark{transition:transform .25s ease}.brand:hover .brand-mark{transform:rotate(-8deg) scale(1.06)}}
 .grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:24px;align-items:start}
 @media (max-width:820px){.grid{grid-template-columns:minmax(0,1fr)}}
 .panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px;display:grid;gap:22px;min-width:0}
@@ -99,7 +105,7 @@ footer{font-size:12.5px;color:var(--muted);max-width:80ch}
 
 <div class="wrap">
   <header>
-    <h1>Anonynowhere</h1>
+    <div class="brand"><svg class="brand-mark" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"> <defs> <linearGradient id="brand-g" x1="0" y1="0" x2="1" y2="1"> <stop offset="0" stop-color="#ff2e7e"/> <stop offset=".55" stop-color="#ff6a3d"/> <stop offset="1" stop-color="#ffb321"/> </linearGradient> <radialGradient id="brand-h" cx=".2" cy=".15" r=".7"> <stop offset="0" stop-color="#fff" stop-opacity=".35"/> <stop offset="1" stop-color="#fff" stop-opacity="0"/> </radialGradient> </defs> <rect width="64" height="64" rx="15" fill="url(#brand-g)"/> <rect width="64" height="64" rx="15" fill="url(#brand-h)"/> <path d="M17.5 49 32 15.5 46.5 49" fill="none" stroke="#fff" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round"/> <circle cx="32" cy="40.5" r="4.2" fill="#1b0f2e"/> </svg><h1>Anonynowhere</h1></div>
   </header>
 
   <div class="grid">
