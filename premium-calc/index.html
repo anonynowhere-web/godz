@@ -524,6 +524,8 @@ function tiersOf(p){
 const tierAmt = n => n>=1e6 ? fmt0(n/1e6)+' ล้าน' : fmt0(n);
 const tierRange = x => 'ทุน '+(x.to ? (x.to>=1e6 ? `${tierAmt(x.from)} – ไม่ถึง ${tierAmt(x.to+1)}` : `${tierAmt(x.from)}–${tierAmt(x.to)}`) : `${tierAmt(x.from)} ขึ้นไป`);
 const grossOf = r => r ? Math.round(r.base*S.sa/1000*100)/100 : 0;
+/* savings line: discount per year and over the whole payment term */
+const saveText = r => { const y=grossOf(r)-r.prem; return `ประหยัดได้ ${money(y)} บาท/ปี รวม ${money(y*r.yrs)} บาท ตลอด ${r.yrs} ปีที่ชำระเบี้ย`; };
 const tierSave = r => r ? Math.round((r.big ? (r.base-r.rate)*S.sa/1000 : r.d*S.sa/1000)*100)/100 : 0;
 /* summary of every discount tier, marking the one that applies */
 function tierSummary(p,r){
@@ -531,8 +533,8 @@ function tierSummary(p,r){
   if(!t.length) return {html:'<p class="tiersum-h">ส่วนลดตามทุนประกัน</p><p class="tiersum-none">แบบนี้ไม่มีส่วนลดตามทุนประกัน</p>', text:['ส่วนลดตามทุนประกัน: แบบนี้ไม่มีส่วนลด']};
   const on=x=>S.sa>=x.from && (x.to==null || S.sa<=x.to), save=tierSave(r);
   return {
-    html:`<p class="tiersum-h">ส่วนลดตามทุนประกัน</p><ul class="tiersum">${t.map(x=>`<li class="${on(x)?'on':''}"><span>${tierRange(x)}</span><b>${x.txt}${on(x)?' ✓':''}</b></li>`).join('')}</ul><p class="tiersum-save">${save>0?`ก่อนส่วนลด ${money(grossOf(r))} − ส่วนลด ${money(grossOf(r)-r.prem)} = หลังส่วนลด ${money(r.prem)} บาท/ปี`:'ทุนนี้ยังไม่ได้ส่วนลด'}</p>`,
-    text:[['ส่วนลดตามทุนประกัน:', ...t.map(x=>`• ${tierRange(x)}: ${x.txt}${on(x)?' ✓ (ระดับที่ได้)':''}`)].join('\n'), save>0?`ส่วนลดที่ได้รับ: ${money(grossOf(r)-r.prem)} บาท/ปี`:'ทุนนี้ยังไม่ได้ส่วนลด']
+    html:`<p class="tiersum-h">ส่วนลดตามทุนประกัน</p><ul class="tiersum">${t.map(x=>`<li class="${on(x)?'on':''}"><span>${tierRange(x)}</span><b>${x.txt}${on(x)?' ✓':''}</b></li>`).join('')}</ul><p class="tiersum-save">${save>0?`ก่อนส่วนลด ${money(grossOf(r))} − ส่วนลด ${money(grossOf(r)-r.prem)} = หลังส่วนลด ${money(r.prem)} บาท/ปี<br><b>${saveText(r)}</b>`:'ทุนนี้ยังไม่ได้ส่วนลด'}</p>`,
+    text:[['ส่วนลดตามทุนประกัน:', ...t.map(x=>`• ${tierRange(x)}: ${x.txt}${on(x)?' ✓ (ระดับที่ได้)':''}`)].join('\n'), save>0?saveText(r):'ทุนนี้ยังไม่ได้ส่วนลด']
   };
 }
 function renderTiers(p,r){
@@ -642,7 +644,7 @@ function render(){
     if(r.big) rows.push([`ส่วนลด ${p.legacyDisc[S.term]}% (ทุนตั้งแต่ 20 ล้าน)`,'−'+fmt2(r.base-r.rate),'neg']);
     if(r.d) rows.push(['ส่วนลดตามทุนประกัน / ทุน 1,000','−'+fmt2(r.d),'neg']);
     if(r.big||r.d) rows.push(['อัตราสุทธิ / ทุน 1,000',fmt2(r.net)]);
-    if(tierSave(r)>0){ const g0=grossOf(r); rows.push(['เบี้ยแบบหลักก่อนส่วนลด / ปี',money(g0)+' บาท'],['หักส่วนลด / ปี','−'+money(g0-r.prem)+' บาท','neg'],['เบี้ยแบบหลักหลังส่วนลด / ปี',money(r.prem)+' บาท','net']); }
+    if(tierSave(r)>0){ const g0=grossOf(r); rows.push(['เบี้ยแบบหลักก่อนส่วนลด / ปี',money(g0)+' บาท'],['หักส่วนลด / ปี','−'+money(g0-r.prem)+' บาท','neg'],['เบี้ยแบบหลักหลังส่วนลด / ปี',money(r.prem)+' บาท','net'],[`ประหยัดรวมตลอด ${r.yrs} ปี`,money((g0-r.prem)*r.yrs)+' บาท','net']); }
     rows.push(['จำนวนปีที่ชำระเบี้ย',r.yrs+' ปี']);
     if(p.extra) rows.push(...p.extra(r,S.g,S.sa));
     $('sDetail').innerHTML=rows.map(([k,v,c])=>`<dt>${k}</dt><dd${c?` class="${c}"`:''}>${v}</dd>`).join('');
