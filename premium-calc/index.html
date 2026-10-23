@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../20pln/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anuphan:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anuphan:wght@500;600;700&family=Mitr:wght@400;500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
 <style>
 /* Layout: two-pane worksheet — inputs on the left, a "premium slip" on the right; stacks to one column on phones */
 :root{
@@ -211,6 +211,60 @@ input[type=range]::-moz-range-thumb{width:24px;height:24px;border-width:4px}
 .c-plan{--sc:#1e88e5}.c-sa{--sc:#0891b2}
 .c-plan .planselect{border:2px solid var(--accent);color:var(--accent);background:var(--surface)}
 .c-plan .planselect:hover{background:color-mix(in srgb,var(--accent) 6%,var(--surface))}
+/* Vivid pop theme: bold gradient backdrop, sticker-style cards with dark outlines and offset shadows */
+:root{
+  --pop-ink:#1b1035; --bg:#fff4fb; --surface:#ffffff; --ink:#1b1035; --muted:#5b4f78; --line:#1b1035;
+  --accent:#ff2e88; --accent-soft:#ffe0ef; --track:#ffd0e6; --field:#ffffff;
+  --display:"Mitr","Anuphan",system-ui,sans-serif;
+}
+:root[data-theme="dark"]{--pop-ink:#000; --bg:#120a24; --surface:#1f1538; --ink:#f6f0ff; --muted:#c3b5e6; --line:#000; --accent:#ff5ca8; --accent-soft:#3a1736; --track:#4a2346; --field:#2a1f48}
+body{background:
+  radial-gradient(circle at 12% 8%,rgba(255,255,255,.35) 0 2px,transparent 3px) 0 0/22px 22px,
+  linear-gradient(135deg,#ff3d7f 0%,#a43bff 45%,#2f7bff 75%,#00d1c1 100%);min-height:100vh}
+:root[data-theme="dark"] body{background:
+  radial-gradient(circle at 12% 8%,rgba(255,255,255,.08) 0 2px,transparent 3px) 0 0/22px 22px,
+  radial-gradient(60% 50% at 0% 0%,#5a1a6e 0,transparent 70%),radial-gradient(60% 50% at 100% 100%,#0b3a6e 0,transparent 70%),#120a24}
+.brand h1{font-family:var(--display);font-weight:700;font-size:clamp(30px,6vw,44px);color:#fff;background:none;-webkit-background-clip:border-box;background-clip:border-box;text-shadow:3px 3px 0 var(--pop-ink);letter-spacing:.01em}
+.themebtn{border:2.5px solid var(--pop-ink);box-shadow:3px 3px 0 var(--pop-ink);background:#fff;color:#1b1035;font-weight:600}
+:root[data-theme="dark"] .themebtn{background:#1f1538;color:#f6f0ff;border-color:#000}
+.panel{border:3px solid var(--pop-ink);border-radius:28px;box-shadow:7px 7px 0 var(--pop-ink);padding:16px;gap:14px}
+.c-plan{--sc:#2f7bff}.c-gender{--sc:#a43bff}.c-term{--sc:#00b37e}.c-age{--sc:#ff7a00}.c-sa{--sc:#ff2e88}.c-rider{--sc:#00a6c7}
+.panel>.tint,.panel .row2>.tint{background:color-mix(in srgb,var(--sc) 16%,var(--surface));border:2.5px solid var(--pop-ink);border-radius:22px;padding:14px 14px 16px}
+:root[data-theme="dark"] .panel>.tint,:root[data-theme="dark"] .panel .row2>.tint{background:color-mix(in srgb,var(--sc) 22%,var(--surface))}
+.tint>.label span:first-child{background:var(--accent);color:#fff;padding:3px 12px 3px 10px;border-radius:999px;font-family:var(--display);font-weight:600;font-size:14px;letter-spacing:0;box-shadow:2px 2px 0 var(--pop-ink)}
+.tint>.label span:first-child::before{background:#fff}
+:root[data-theme="dark"] .tint>.label span:first-child{color:#140b25}
+:root[data-theme="dark"] .tint>.label span:first-child::before{background:#140b25}
+.planselect,.riders select,.c-plan .planselect{border:2.5px solid var(--pop-ink);box-shadow:3px 3px 0 var(--pop-ink);background:var(--surface);color:var(--ink);font-family:var(--display);font-weight:500}
+.c-plan .planselect{color:var(--accent)}
+.numwrap{border:2.5px solid var(--pop-ink);box-shadow:3px 3px 0 var(--pop-ink);background:var(--surface)}
+.seg{border:2.5px solid var(--pop-ink);background:var(--surface);box-shadow:3px 3px 0 var(--pop-ink)}
+.seg button{font-family:var(--display);font-weight:500;color:var(--ink)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:#fff;box-shadow:inset 0 -3px 0 rgba(0,0,0,.18)}
+:root[data-theme="dark"] .seg button[aria-pressed="true"]{color:#140b25}
+input[type=range]::-webkit-slider-runnable-track{border:2px solid var(--pop-ink);height:12px;border-radius:6px}
+input[type=range]::-moz-range-track{border:2px solid var(--pop-ink);height:12px;border-radius:6px}
+input[type=range]::-webkit-slider-thumb{background:var(--accent);border:3px solid var(--pop-ink);margin-top:-11px;box-shadow:2px 2px 0 var(--pop-ink)}
+input[type=range]::-moz-range-thumb{background:var(--accent);border:3px solid var(--pop-ink)}
+.tiers button{border:2px solid var(--pop-ink);background:var(--surface)}
+.tiers button.on{background:var(--accent);box-shadow:3px 3px 0 var(--pop-ink)}
+.tiers button.on,.tiers button.on b,.tiers button.on small,.tiers button.on span{color:#fff}
+:root[data-theme="dark"] .tiers button.on,:root[data-theme="dark"] .tiers button.on b,:root[data-theme="dark"] .tiers button.on small,:root[data-theme="dark"] .tiers button.on span{color:#140b25}
+.addbtn{border:2.5px solid var(--pop-ink);box-shadow:3px 3px 0 var(--pop-ink);font-family:var(--display);font-weight:600}
+.addbtn:active,.sh:active,.seg button:active,.themebtn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--pop-ink)}
+.riders li{border:2.5px solid var(--pop-ink);background:color-mix(in srgb,var(--accent) 18%,var(--surface));box-shadow:3px 3px 0 var(--pop-ink)}
+.riders li b{font-family:var(--display);font-weight:600}
+.rm{border:2px solid var(--pop-ink);background:var(--surface);color:var(--ink)}
+.slip h2{font-family:var(--display);font-weight:600;font-size:19px}
+.slip .big{background:linear-gradient(120deg,#ff2e88,#a43bff);border:2.5px solid var(--pop-ink);border-radius:20px;padding:12px 16px;box-shadow:3px 3px 0 var(--pop-ink)}
+.slip .big .k,.slip .big .v,.slip .big .v small,.slip .big .daily{color:#fff}
+:root[data-theme="dark"] .big .v{color:#fff}
+.tiersum li{border:2px solid var(--pop-ink);background:var(--surface)}
+.tiersum li.on{background:var(--accent);color:#fff}
+.tiersum li.on b,.tiersum li.on small,.tiersum li.on span{color:#fff}
+.sh{border:2.5px solid var(--pop-ink);box-shadow:3px 3px 0 var(--pop-ink);font-family:var(--display);font-weight:500}
+.sh-line{background:#06c755}.sh-mail{background:#ff2e88}.sh-copy{background:#2f7bff}
+footer{color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.35)}
 </style>
 </head>
 <body>
