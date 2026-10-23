@@ -331,7 +331,7 @@ let shareMsg = '';
 /* Accident riders (AI/ADD/ADB + RCC): rate per 1,000 incl. RCC 1.25, from the user's summary sheet rev1 (AI matches the AIA manual table quoted by agents); SA up to 6x the main plan's SA */
 function accOptions(max){ const o=[]; for(let v=100000; v<=max; v+= v<1e6?100000 : v<5e6?500000 : v<1e7?1e6 : v<5e7?5e6 : 1e7) o.push(v); return o; }
 function accMax(){ return Math.max(100000, Math.floor(6*(isFinite(S.sa)?S.sa:0)/100000)*100000); }
-/* Riders: flat annual premium by entry-age band and gender (Health Happy 07/2025, Health Saver 01/2026, Health Starter); CI Plus 07/2025 = rate per 1,000 x rider SA; Care for Cancer 07/2025 = rate per 100,000 x rider SA; Health CI Hero 07/2026 = flat by plan */
+/* Riders: flat annual premium by entry-age band and gender (Health Happy 07/2025, Health Saver 01/2026, Health Starter); CI Plus 07/2025 = rate per 1,000 x rider SA; Care for Cancer 07/2025 = rate per 100,000 x rider SA; Health CI Hero 07/2026 = flat by plan; Multi-Pay CI Plus 07/2025 = (Multi-Pay CI + Total Care) rate per 1,000 x SA */
 function bandPremium(age,g,plan){const i=this.bands.findIndex(([a,b])=>age>=a&&age<=b); return i<0?null:this.rates[g][i][plan-1];}
 const RIDERS=[
  {id:'hh', color:'#be185d', name:'Health Happy', th:'ค่ารักษาพยาบาลแบบเหมาจ่าย', ages:[11,75],
@@ -357,6 +357,10 @@ const RIDERS=[
  {id:'ci', color:'#b45309', name:'CI Plus', th:'คุ้มครองโรคร้ายแรง 44 โรค/การรักษา', ages:[0,75], saCfg:{min:100000,max:25000000,step:100000,def:100000},
   bands:[[0,15],[16,20],[21,25],[26,30],[31,35],[36,40],[41,45],[46,50],[51,55],[56,60],[61,65],[66,70],[71,75]],
   rates:{m:[2.62,2.76,2.89,3.16,3.84,5.23,10.19,15.92,25.38,42.31,61.04,81.76,112.64], f:[2.27,2.06,2.15,2.55,3.53,4.6,6.38,10.17,15.92,26.09,35.81,51.71,73.52]},
+  premium(g,age,_,sa){const i=this.bands.findIndex(([a,b])=>age>=a&&age<=b); return i<0?null:Math.round(this.rates[g][i]*sa/10)/100;}},
+ {id:'mpci', color:'#a16207', name:'Multi-Pay CI Plus', th:'โรคร้ายแรงจ่ายหลายครั้ง + Total Care', ages:[0,75], saCfg:{min:100000,max:50000000,step:100000,def:100000},
+  bands:[[0,5],[6,10],[11,15],[16,20],[21,25],[26,30],[31,35],[36,40],[41,45],[46,50],[51,55],[56,60],[61,65],[66,70],[71,75]],
+  rates:{m:[6.31,4.61,4.55,4.52,5.05,5.56,6.61,8.75,16.87,27.7,49.73,83.62,130.07,163.89,235.83], f:[5.13,3.83,3.76,3.49,4.18,4.73,6.23,7.35,10.04,16.31,29.16,45.37,69.55,102.32,157.17]},
   premium(g,age,_,sa){const i=this.bands.findIndex(([a,b])=>age>=a&&age<=b); return i<0?null:Math.round(this.rates[g][i]*sa/10)/100;}},
  {id:'hero', color:'#c2410c', name:'Health CI Hero', th:'ค่ารักษาโรคร้ายแรงและการรักษา สูงสุด 12 ล้าน/ปี', ages:[0,65],
   plans:[{n:1,t:'begin',c:0,label:'แผน 2 ล้านบาท แบบ Begin',detail:'ร่วมจ่าย 10% รพ.ในสิทธิ (ไม่เกิน 10,000) / 30% นอกสิทธิ (ไม่เกิน 90,000)'},{n:2,t:'begin',c:1,label:'แผน 6 ล้านบาท แบบ Begin',detail:'ร่วมจ่าย 10% รพ.ในสิทธิ (ไม่เกิน 10,000) / 30% นอกสิทธิ (ไม่เกิน 90,000)'},{n:3,t:'begin',c:2,label:'แผน 12 ล้านบาท แบบ Begin',detail:'ร่วมจ่าย 10% รพ.ในสิทธิ (ไม่เกิน 10,000) / 30% นอกสิทธิ (ไม่เกิน 90,000)'},{n:4,t:'bal',c:0,label:'แผน 2 ล้านบาท แบบ Balanced',detail:'ไม่มีร่วมจ่าย รพ.ในสิทธิ / 20% นอกสิทธิ (ไม่เกิน 60,000)'},{n:5,t:'bal',c:1,label:'แผน 6 ล้านบาท แบบ Balanced',detail:'ไม่มีร่วมจ่าย รพ.ในสิทธิ / 20% นอกสิทธิ (ไม่เกิน 60,000)'},{n:6,t:'bal',c:2,label:'แผน 12 ล้านบาท แบบ Balanced',detail:'ไม่มีร่วมจ่าย รพ.ในสิทธิ / 20% นอกสิทธิ (ไม่เกิน 60,000)'}],
@@ -388,7 +392,7 @@ const RIDERS=[
 ];
 /* dropdown groups: [heading, ids] in display order */
 const PLAN_GROUPS=[['ประกันตลอดชีพ',['p20','p1015','plus','senior','p65']],['ประกันสะสมทรัพย์',['ss','lti','p5','end','exc']],['ประกันบำนาญ',['asure','afix']],['ประกันเพื่อส่งต่อมรดก (Legacy)',['legacy','lplus','lprot']]];
-const RIDER_GROUPS=[['ค่ารักษาพยาบาล',['hh','hs','st','hk']],['โรคร้ายแรง',['ci','cc','hero']],['อุบัติเหตุ',['ai','add','adb']]];
+const RIDER_GROUPS=[['ค่ารักษาพยาบาล',['hh','hs','st','hk']],['โรคร้ายแรง',['ci','mpci','cc','hero']],['อุบัติเหตุ',['ai','add','adb']]];
 const groupHTML=(groups,items,opt)=>groups.map(([h,ids])=>{ const xs=ids.map(id=>items.find(x=>x.id===id)).filter(Boolean); return xs.length?`<optgroup label="${h}">${xs.map(opt).join('')}</optgroup>`:''; }).join('');
 const riderDef = id => RIDERS.find(x=>x.id===id);
 const planAges = (d,n) => (n && d.plans && d.plans[n-1] && d.plans[n-1].ages) || d.ages;
