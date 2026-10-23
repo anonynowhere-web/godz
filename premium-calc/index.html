@@ -378,6 +378,17 @@ const RIDERS=[
   rates:{1:{m:[[53500,73900,104700,143000],[28600,39400,58500,82500]], f:[[47600,64400,88500,123000],[24600,34500,47700,67900]]},
          2:{m:[[33500,53900,84600,123000],[14500,22400,40500,64500]], f:[[27600,44400,68400,103000],[11000,17500,29700,49900]]}},
   premium(g,age,n,sa){const i=this.bands.findIndex(([a,b])=>age>=a&&age<=b), j=this.saCfg.snap.indexOf(sa); return i<0||j<0?null:this.rates[n][g][i][j];}},
+ {id:'tpd', color:'#57534e', name:'TPD', th:'ทุพพลภาพถาวรสิ้นเชิง รับ 100% ของทุน', ages:[0,70], saCfg:{min:100000,max:50000000,step:100000,def:100000},
+  bands:[[0,5],[6,15],[16,20],[21,25],[26,30],[31,35],[36,40],[41,45],[46,50],[51,55],[56,60],[61,65],[66,70]],
+  rates:{m:[0.1,0.08,0.23,0.28,0.31,0.36,0.46,0.61,0.87,1.25,1.86,2.98,5.03], f:[0.08,0.06,0.08,0.09,0.1,0.12,0.16,0.24,0.36,0.55,0.91,1.58,3.01]},
+  premium(g,age,_,sa){const i=this.bands.findIndex(([a,b])=>age>=a&&age<=b); return i<0?null:Math.round(this.rates[g][i]*sa/10)/100;}},
+ {id:'wpci', color:'#0e7490', name:'WPCI', th:'ยกเว้นเบี้ยแบบหลักเมื่อเป็นโรคร้ายแรง 40 โรค', ages:[16,75], auto:true,
+  bands:[[16,20],[21,25],[26,30],[31,35],[36,40],[41,45],[46,50],[51,55],[56,60],[61,65],[66,70],[71,75]],
+  terms:[5,10,15,20,25,30,35,40,50,60,70,80],
+  rates:{m:[[2.7,5.9,9.1,12.1,15.1,19.8,27.2,37.3,65.9,92.6,96,97.4],[2.8,6.5,10.5,14.7,20.5,28.9,41.2,57.5,95.8,113,116],[3.4,8.3,14.1,21.9,32.4,46.8,67.1,90.8,132.8,138.8,141.6],[4.6,11.9,23.2,37.6,55.8,79.5,109.5,140,167.2,174.4],[7.7,23,43.9,68.8,99,134,173.4,207.9,219.1,221.1],[17.1,44.5,78.9,119.8,163.3,207.6,251.9,258.9,272.2],[27.8,71.5,125.1,182.3,234.6,284,292,299.8,315.1],[49.9,123.1,202.3,276.9,334.6,344.5,353.7,359.6],[82.4,194.8,304.6,395.8,450.5,464.2,465.5,466.5],[116.6,280.7,423.2,506,526.2,528.2,529.7],[159.1,367.9,517.8,574.8,578.6,580.2],[211.9,440.4,558.4,576,577.8]], f:[[2.9,6.6,10.3,14,17.8,22.8,29,37.1,59.1,86.3,89.4,91.4],[3.3,7.8,12.8,17.8,22.9,30.5,40.3,52.6,83.3,102.5,105.5],[4.2,10.4,17.3,24.1,32.2,44.1,59.3,77.6,119,123.3,126.1],[6.2,14.7,23.9,34.2,47.8,66.7,89.3,114.1,143.3,147.4],[7.7,19.1,33.8,50.7,73.5,102.2,133.5,167.7,173.3,177.1],[11.7,30.3,54.5,82.2,117.4,157.3,200.7,204.2,210.7],[18.8,49.7,89.4,130.9,181.5,236.7,241.3,245.4,252.1],[32,83,136.7,192.8,260.5,266.2,271,275.3],[50.9,125.5,199,267.2,309.4,322.4,324.4,325.7],[71.5,173.3,277.4,348.8,381.2,385.3,387],[97.9,235,348,409.4,418.2,420.1],[136.8,297.5,402.1,430.1,432.2]]},
+  /* rider SA = main plan annual premium; rate by entry age and main plan's pay years (brochure lists sample terms only) */
+  main(){const r=calc(S.plan,S.term,S.g,S.age,S.sa); return r&&{sa:r.prem, yrs:r.yrs};},
+  premium(g,age){const m=this.main(), i=this.bands.findIndex(([a,b])=>age>=a&&age<=b); if(!m||i<0) return null; const j=this.terms.indexOf(m.yrs), x=j<0?null:this.rates[g][i][j]; return x==null?null:Math.round(x*m.sa/10)/100;}},
  {id:'ai', color:'#7e22ce', name:'AI/RCC', th:'อุบัติเหตุ คุ้มครองครบ + ชดเชยรายสัปดาห์', ages:[16,64],
   saCfg:{min:100000,step:100000,maxNote:' (ไม่เกิน 6 เท่าของทุนแบบหลัก)',list:true,get max(){return accMax();},get def(){return this.min;}},
   plans:[{n:1,label:'ชั้นอาชีพ 1 · งานออฟฟิศ',short:'ชั้นอาชีพ 1'},{n:2,label:'ชั้นอาชีพ 2 · ออกนอกสถานที่',short:'ชั้นอาชีพ 2'},{n:3,label:'ชั้นอาชีพ 3 · งานช่าง/ใช้แรงงาน',short:'ชั้นอาชีพ 3'},{n:4,label:'ชั้นอาชีพ 4 · งานเสี่ยงภัย',short:'ชั้นอาชีพ 4'}],
@@ -392,7 +403,7 @@ const RIDERS=[
 ];
 /* dropdown groups: [heading, ids] in display order */
 const PLAN_GROUPS=[['ประกันตลอดชีพ',['p20','p1015','plus','senior','p65']],['ประกันสะสมทรัพย์',['ss','lti','p5','end','exc']],['ประกันบำนาญ',['asure','afix']],['ประกันเพื่อส่งต่อมรดก (Legacy)',['legacy','lplus','lprot']]];
-const RIDER_GROUPS=[['ค่ารักษาพยาบาล',['hh','hs','st','hk']],['โรคร้ายแรง',['ci','mpci','cc','hero']],['อุบัติเหตุ',['ai','add','adb']]];
+const RIDER_GROUPS=[['ค่ารักษาพยาบาล',['hh','hs','st','hk']],['โรคร้ายแรง',['ci','mpci','cc','hero']],['อุบัติเหตุ',['ai','add','adb']],['ทุพพลภาพ / ยกเว้นเบี้ย',['tpd','wpci']]];
 const groupHTML=(groups,items,opt)=>groups.map(([h,ids])=>{ const xs=ids.map(id=>items.find(x=>x.id===id)).filter(Boolean); return xs.length?`<optgroup label="${h}">${xs.map(opt).join('')}</optgroup>`:''; }).join('');
 const riderDef = id => RIDERS.find(x=>x.id===id);
 const planAges = (d,n) => (n && d.plans && d.plans[n-1] && d.plans[n-1].ages) || d.ages;
@@ -405,7 +416,7 @@ const riderSaToPos = (c,sa) => c.snap ? Math.max(0,c.snap.indexOf(snapSa(c,sa)))
 const riderPosToSa = (c,pos) => c.snap ? c.snap[pos] : Math.round((c.min+(c.max-c.min)*(pos/1000)**2)/c.step)*c.step;
 const planText = (d,n) => { const pl=d.plans[n-1]; return pl.detail ? `${pl.label} · ${pl.detail}` : `${pl.label} · ค่าห้อง ${pl.room} บาท/วัน`; };
 const planShort = (d,n) => d.plans[n-1].label;
-const riderLabel = (d,rd) => d.saCfg ? `ทุน ${fmt0(rd.sa)} บาท${d.plans?' '+(d.plans[rd.plan-1].short||d.plans[rd.plan-1].label):''}` : planShort(d,rd.plan);
+const riderLabel = (d,rd) => d.auto ? (m=>m?`ทุน ${fmt0(m.sa)} บาท (= เบี้ยแบบหลัก)`:'')(d.main()) : d.saCfg ? `ทุน ${fmt0(rd.sa)} บาท${d.plans?' '+(d.plans[rd.plan-1].short||d.plans[rd.plan-1].label):''}` : planShort(d,rd.plan);
 const S = {plan:PLANS[0], g:'f', term:20, age:30, sa:PLANS[0].saMin, riders:[]};
 const $ = id => document.getElementById(id);
 const saMinOf = (p,t) => typeof p.saMin==='function' ? p.saMin(t) : p.saMin;
@@ -604,7 +615,7 @@ function renderRiders(){
   const cur=riderDef(pick.value);
   const keepPlan=pp.value;
   pp.hidden=!!(cur&&!cur.plans); $('riderSaNote').hidden=!pp.hidden;
-  if(pp.hidden) $('riderSaNote').textContent=`ทุนเริ่มต้น ${fmt0(cur.saCfg.def)} บาท ปรับได้หลังกดเพิ่ม`;
+  if(pp.hidden) $('riderSaNote').textContent= cur.auto ? 'ทุนเท่ากับเบี้ยแบบหลักต่อปี คิดให้อัตโนมัติ' : `ทุนเริ่มต้น ${fmt0(cur.saCfg.def)} บาท ปรับได้หลังกดเพิ่ม`;
   setHTML(pp, cur && cur.plans ? cur.plans.map(pl=>`<option value="${pl.n}">${pl.label}</option>`).join('') : '<option value="">–</option>');
   if(cur && keepPlan) pp.value=keepPlan;
   if(cur && !pp.value) pp.value='1';
@@ -625,7 +636,8 @@ function renderRiders(){
   }).join(''));
   S.riders.forEach(rd=>{
     const d=riderDef(rd.id), v=riderPrem(rd), el=$(`rider-price-${rd.id}`), [a,b]=planAges(d,rd.plan);
-    const off = v==null ? (S.age<a||S.age>b ? `ไม่รับประกันที่อายุนี้ (${rangeText([a,b],d)})` : (d.saCfg.snap ? saRangeText(d.saCfg) : `ทุนต้องอยู่ระหว่าง ${fmt0(d.saCfg.min)} – ${fmt0(d.saCfg.max)} บาท`)) : '';
+    const off = v==null ? (S.age<a||S.age>b ? `ไม่รับประกันที่อายุนี้ (${rangeText([a,b],d)})` : d.auto ? (d.main() ? `ไม่มีอัตราสำหรับชำระเบี้ย ${d.main().yrs} ปี ที่อายุนี้ (โบรชัวร์มีอัตรา ${d.terms.join(', ')} ปี)` : 'ยังคำนวณเบี้ยแบบหลักไม่ได้') : (d.saCfg.snap ? saRangeText(d.saCfg) : `ทุนต้องอยู่ระหว่าง ${fmt0(d.saCfg.min)} – ${fmt0(d.saCfg.max)} บาท`)) : '';
+    if(d.auto) el.parentElement.querySelector('small').textContent = d.th + (riderLabel(d,rd)?' · '+riderLabel(d,rd):'');
     el.className = off ? 'rp off' : 'rp'; el.textContent = off || `${money(v)} บาท/ปี`;
     if(d.saCfg && d.saCfg.list){
       const opts=accOptions(d.saCfg.max); if(isFinite(rd.sa) && !opts.includes(rd.sa)) opts.push(rd.sa);
