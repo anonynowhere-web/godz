@@ -75,6 +75,16 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
 .tiers button.on{border-color:var(--accent);background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
 .tiers button.on b{color:var(--accent)}
 .tiers button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tierbox{display:grid;gap:6px}
+.tierbox:empty{display:none}
+.tiersum-h{margin:0;font-size:12.5px;font-weight:600;letter-spacing:.04em;color:var(--muted)}
+.tiersum-none,.tiersum-save{margin:0;font-size:13px;color:var(--muted)}
+.tiersum-save{color:var(--accent);font-weight:500}
+.tiersum{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.tiersum li{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:6px 10px;border:1px solid var(--line);border-radius:8px;color:var(--muted)}
+.tiersum li b{font-weight:600;color:var(--ink);text-align:right}
+.tiersum li.on{border-color:var(--accent);background:var(--accent-soft)}
+.tiersum li.on b{color:var(--accent)}
 .discnow{font-size:13px;color:var(--accent);font-weight:500}
 .discnow:empty{display:none}
 .rideradd{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center}
@@ -224,6 +234,7 @@ footer{font-size:12.5px;color:var(--muted);max-width:80ch}
         <span class="daily" id="sDaily"></span>
       </div>
       <dl id="sDetail"></dl>
+      <div class="tierbox" id="sTiers"></div>
       <div class="share" id="shareBox">
         <a class="sh sh-line" id="shLine" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3C6.5 3 2 6.6 2 11c0 3.9 3.5 7.2 8.3 7.9.3.1.8.2.9.5.1.3.1.7 0 1l-.1.9c0 .3-.2 1 .9.5s5.9-3.5 8-6c1.4-1.6 2-3.1 2-4.8C22 6.6 17.5 3 12 3z"/></svg>ส่ง LINE</a>
         <a class="sh sh-mail" id="shMail"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M3 6h18v12H3zM3 7l9 6 9-6"/></svg>ส่งอีเมล</a>
@@ -427,17 +438,29 @@ function tiersOf(p){
   const t=[[lo,0],...p.tiers.filter(([f])=>f>lo)];
   return t.map(([f,d],i)=>({from:f,to:t[i+1]?t[i+1][0]-1:null,txt:d?`ลด ${fmt2(d)} บาท/ทุน 1,000`:'ไม่มีส่วนลด'}));
 }
+const tierAmt = n => n>=1e6 ? fmt0(n/1e6)+' ล้าน' : fmt0(n);
+const tierRange = x => 'ทุน '+(x.to ? (x.to>=1e6 ? `${tierAmt(x.from)} – ไม่ถึง ${tierAmt(x.to+1)}` : `${tierAmt(x.from)}–${tierAmt(x.to)}`) : `${tierAmt(x.from)} ขึ้นไป`);
+const tierSave = r => r ? Math.round((r.big ? (r.base-r.rate)*S.sa/1000 : r.d*S.sa/1000)*100)/100 : 0;
+/* summary of every discount tier, marking the one that applies */
+function tierSummary(p,r){
+  const t=tiersOf(p);
+  if(!t.length) return {html:'<p class="tiersum-h">ส่วนลดตามทุนประกัน</p><p class="tiersum-none">แบบนี้ไม่มีส่วนลดตามทุนประกัน</p>', text:['ส่วนลดตามทุนประกัน: แบบนี้ไม่มีส่วนลด']};
+  const on=x=>S.sa>=x.from && (x.to==null || S.sa<=x.to), save=tierSave(r);
+  return {
+    html:`<p class="tiersum-h">ส่วนลดตามทุนประกัน</p><ul class="tiersum">${t.map(x=>`<li class="${on(x)?'on':''}"><span>${tierRange(x)}</span><b>${x.txt}${on(x)?' ✓':''}</b></li>`).join('')}</ul><p class="tiersum-save">${save>0?`ส่วนลดที่ได้รับ ${money(save)} บาท/ปี`:'ทุนนี้ยังไม่ได้ส่วนลด'}</p>`,
+    text:[['ส่วนลดตามทุนประกัน:', ...t.map(x=>`• ${tierRange(x)}: ${x.txt}${on(x)?' ✓ (ระดับที่ได้)':''}`)].join('\n'), save>0?`ส่วนลดที่ได้รับ: ${money(save)} บาท/ปี`:'ทุนนี้ยังไม่ได้ส่วนลด']
+  };
+}
 function renderTiers(p,r){
   const t=tiersOf(p), sa=S.sa;
-  const amt = n => n>=1e6 ? fmt0(n/1e6)+' ล้าน' : fmt0(n);
-  setHTML($('saTiers'), t.map(x=>`<button type="button" data-sa="${x.from}"><span>ทุน ${x.to?(x.to>=1e6?`${amt(x.from)} – ไม่ถึง ${amt(x.to+1)}`:`${amt(x.from)}–${amt(x.to)}`):`${amt(x.from)} ขึ้นไป`}</span><b>${x.txt}</b></button>`).join(''));
+  setHTML($('saTiers'), t.map(x=>`<button type="button" data-sa="${x.from}"><span>${tierRange(x)}</span><b>${x.txt}</b></button>`).join(''));
   [...$('saTiers').children].forEach((b,i)=>b.classList.toggle('on', isFinite(sa) && sa>=t[i].from && (t[i].to==null || sa<=t[i].to)));
   $('saTiers').hidden=!t.length;
   let msg='แบบนี้ไม่มีส่วนลดตามทุนประกัน';
   if(t.length && r){
-    const save = r.big ? (r.base-r.rate)*sa/1000 : r.d*sa/1000;
+    const save = tierSave(r);
     const next = t.find(x=>x.from>sa);
-    msg = save>0 ? `ได้ส่วนลด ${money(Math.round(save*100)/100)} บาท/ปี` : 'ทุนนี้ยังไม่ได้ส่วนลด';
+    msg = save>0 ? `ได้ส่วนลด ${money(save)} บาท/ปี` : 'ทุนนี้ยังไม่ได้ส่วนลด';
     if(next) msg += ` · เพิ่มทุนเป็น ${fmt0(next.from)} บาท ได้${next.txt}`;
   } else if(t.length) msg='';
   $('saDisc').textContent=msg;
@@ -510,7 +533,7 @@ function render(){
   $('sPremK').textContent = rAdds.length ? 'เบี้ยรวมปีแรก (แบบหลัก + สัญญาเพิ่มเติม)' : 'เบี้ยประกันรายปี';
   if(!r){
     $('sPrem').innerHTML='–'; $('shareBox').hidden=true; $('sDaily').textContent='ปรับอายุหรือทุนประกันให้อยู่ในเงื่อนไขของแบบนี้';
-    $('sDetail').innerHTML=''; $('cmp').innerHTML=''; $('cmpBox').hidden=true;
+    $('sDetail').innerHTML=''; $('sTiers').innerHTML=''; $('cmp').innerHTML=''; $('cmpBox').hidden=true;
   } else {
     const first=r.prem+rSum;
     $('sPrem').innerHTML=`${money(first)}<small>บาท</small>`;
@@ -519,6 +542,7 @@ function render(){
       `แบบ: ${p.name} – ${p.th}`,
       `ผู้เอาประกัน: ${gx} อายุ ${ageText(S.age)}`,
       `ทุนประกัน: ${fmt0(S.sa)} บาท`,
+      ...tierSummary(p,r).text,
       `ชำระเบี้ย: ${termLabel(S.term)}${typeof S.term==='number'?'':` (${r.yrs} ปี)`}`,
       `เบี้ยแบบหลักรายปี: ${money(r.prem)} บาท`,
       ...rAdds.map(x=>`สัญญาเพิ่มเติม ${x.d.name} ${riderLabel(x.d,x.rd)}: ${money(x.v)} บาท/ปี`),
@@ -537,6 +561,7 @@ function render(){
     rows.push(['จำนวนปีที่ชำระเบี้ย',r.yrs+' ปี']);
     if(p.extra) rows.push(...p.extra(r,S.g,S.sa));
     $('sDetail').innerHTML=rows.map(([k,v,c])=>`<dt>${k}</dt><dd${c?` class="${c}"`:''}>${v}</dd>`).join('');
+    $('sTiers').innerHTML=tierSummary(p,r).html;
     const many=p.terms.length>1; $('cmpBox').hidden=!many;
     if(many) $('cmp').innerHTML=p.terms.map(t=>{
       const lo=saMinOf(p,t); if(S.sa<lo) return `<tr><td>${termLabel(t)}</td><td colspan="2">ทุนขั้นต่ำ ${fmt0(lo)}</td></tr>`;
@@ -545,7 +570,7 @@ function render(){
       return `<tr class="${t===S.term?'on':''}"><td>${termLabel(t)}</td><td>${fmt2(x.net)}</td><td>${money(x.prem)}</td></tr>`;}).join('');
   }
   const notes=[];
-  if(p.discNote) notes.push(p.discNote+' (หักจากอัตราเบี้ยแล้ว)');
+  if(p.discNote) notes.push('ส่วนลดตามทุนหักจากอัตราเบี้ยแล้ว');
   if(p.legacyDisc) notes.push('ทุนตั้งแต่ 20 ล้านบาทใช้อัตราที่หักส่วนลดแล้วตามตารางในโบรชัวร์ ส่วนอัตราสุขภาพดีกว่ามาตรฐาน (Preferred) โบรชัวร์ไม่ได้ให้ตารางไว้ จึงยังไม่คำนวณ');
   if(p.id==='senior') notes.push('รวมทุกกรมธรรม์ไม่เกิน 200,000 บาทต่อราย ไม่ตรวจสุขภาพและไม่ต้องตอบคำถามสุขภาพ');
   if(p.id==='p65') notes.push('อัตราเบี้ยของแบบนี้เท่ากันทั้งชายและหญิง');
