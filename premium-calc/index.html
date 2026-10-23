@@ -317,11 +317,11 @@ const PLANS = [
   ages:[0,75], terms:[20], saMin:100000, saMax:null, sliderMax:20000000, rows:R.exc, unisex:true,
   col:()=>0, disc:sa=> sa>=250000?1:0, tiers:[[250000,1]],
   discNote:'ส่วนลด 1 บาท/1,000 เมื่อทุนตั้งแต่ 250,000', chips:[100000,250000,1000000,5000000]},
- {id:'asure', name:'Annuity Sure', thn:'บำนาญ ได้ชัวร์ (บำนาญแบบลดหย่อนภาษีได้)', th:'บำนาญ ชำระเบี้ย 9 ปี หรือถึงอายุ 60 รับบำนาญปีละ 15% ของทุน อายุ 60–90 ปี', cover:'คุ้มครองถึงอายุ 90 ปี',
+ {id:'asure', riders:['ai','add','adb'], name:'Annuity Sure', thn:'บำนาญ ได้ชัวร์ (บำนาญแบบลดหย่อนภาษีได้)', th:'บำนาญ ชำระเบี้ย 9 ปี หรือถึงอายุ 60 รับบำนาญปีละ 15% ของทุน อายุ 60–90 ปี', cover:'คุ้มครองถึงอายุ 90 ปี',
   get ages(){ return S.term===9 ? [20,50] : [20,55]; }, terms:[9,'to60'], saMin:100000, saMax:null, sliderMax:10000000, rows:R.asure,
   col:(t,s)=>(t===9?0:2)+(s==='m'?0:1), disc:()=>0, chips:[100000,500000,1000000,3000000],
   extra:(r,g,sa)=>[['เงินบำนาญต่อปี (15% · อายุ 60–90 ปี)',money(sa*0.15)+' บาท']]},
- {id:'afix', name:'Annuity Fix', thn:'บำนาญ มั่นคง (บำนาญแบบลดหย่อนภาษีได้)', th:'บำนาญ ชำระเบี้ยถึงอายุ 60 ทุน = มูลค่าบำนาญตั้งต้น', cover:'รับบำนาญอายุ 60–85 ปี',
+ {id:'afix', riders:['ai','add','adb'], name:'Annuity Fix', thn:'บำนาญ มั่นคง (บำนาญแบบลดหย่อนภาษีได้)', th:'บำนาญ ชำระเบี้ยถึงอายุ 60 ทุน = มูลค่าบำนาญตั้งต้น', cover:'รับบำนาญอายุ 60–85 ปี',
   ages:[20,55], terms:['to60'], saMin:200000, saMax:null, sliderMax:10000000, rows:R.afix,
   col:(t,s)=>s==='m'?0:1, disc:()=>0, chips:[200000,500000,1000000,2000000],
   extra:(r,g,sa)=>[[`เงินบำนาญต่อปี (${g==='m'?'6.25':'5.95'}% · อายุ 60–85 ปี)`,money(Math.round(sa*(g==='m'?0.0625:0.0595)*100)/100)+' บาท']]},
@@ -411,7 +411,9 @@ const rangeText = ([a,b],d) => `${a===0?(d&&d.ageLo||'15 วัน'):a}–${b} �
 const saOk = (d,sa) => !d.saCfg || (d.saCfg.snap ? d.saCfg.snap.includes(sa) : isFinite(sa) && sa>=d.saCfg.min && sa<=d.saCfg.max);
 const saRangeText = c => c.snap ? `ทุนเลือกได้ ${c.snap.map(v=>fmt0(v/1e6)).join(' / ')} ล้านบาท` : `ทุน ${fmt0(c.min)} – ${fmt0(c.max)} บาท${c.maxNote||''}`;
 const snapSa = (c,sa) => !c.snap||!isFinite(sa) ? sa : c.snap.reduce((a,b)=>Math.abs(b-sa)<Math.abs(a-sa)?b:a);
-const riderPrem = rd => { const d=riderDef(rd.id), [a,b]=planAges(d,rd.plan); return (S.age>=a&&S.age<=b&&saOk(d,rd.sa)) ? d.premium(S.g,S.age,rd.plan,rd.sa) : null; };
+/* annuity brochures allow accident riders only */
+const riderAllowed = id => !S.plan.riders || S.plan.riders.includes(id);
+const riderPrem = rd => { const d=riderDef(rd.id), [a,b]=planAges(d,rd.plan); return (riderAllowed(rd.id)&&S.age>=a&&S.age<=b&&saOk(d,rd.sa)) ? d.premium(S.g,S.age,rd.plan,rd.sa) : null; };
 const riderSaToPos = (c,sa) => c.snap ? Math.max(0,c.snap.indexOf(snapSa(c,sa))) : Math.round(Math.sqrt(Math.max(0,Math.min(1,(sa-c.min)/(c.max-c.min))))*1000);
 const riderPosToSa = (c,pos) => c.snap ? c.snap[pos] : Math.round((c.min+(c.max-c.min)*(pos/1000)**2)/c.step)*c.step;
 const planText = (d,n) => { const pl=d.plans[n-1]; return pl.detail ? `${pl.label} · ${pl.detail}` : `${pl.label} · ค่าห้อง ${pl.room} บาท/วัน`; };
@@ -607,7 +609,7 @@ function render(){
 }
 
 function renderRiders(){
-  const free=RIDERS.filter(d=>!S.riders.some(x=>x.id===d.id));
+  const free=RIDERS.filter(d=>riderAllowed(d.id)&&!S.riders.some(x=>x.id===d.id));
   const pick=$('riderPick'), pp=$('riderPlanPick'), add=$('riderAdd');
   const keep=pick.value;
   setHTML(pick, free.length ? groupHTML(RIDER_GROUPS, free, d=>`<option value="${d.id}">${d.name} – ${d.th}</option>`) : '<option value="">เพิ่มครบทุกสัญญาแล้ว</option>');
@@ -636,7 +638,7 @@ function renderRiders(){
   }).join(''));
   S.riders.forEach(rd=>{
     const d=riderDef(rd.id), v=riderPrem(rd), el=$(`rider-price-${rd.id}`), [a,b]=planAges(d,rd.plan);
-    const off = v==null ? (S.age<a||S.age>b ? `ไม่รับประกันที่อายุนี้ (${rangeText([a,b],d)})` : d.auto ? (d.main() ? `ไม่มีอัตราสำหรับชำระเบี้ย ${d.main().yrs} ปี ที่อายุนี้ (โบรชัวร์มีอัตรา ${d.terms.join(', ')} ปี)` : 'ยังคำนวณเบี้ยแบบหลักไม่ได้') : (d.saCfg.snap ? saRangeText(d.saCfg) : `ทุนต้องอยู่ระหว่าง ${fmt0(d.saCfg.min)} – ${fmt0(d.saCfg.max)} บาท`)) : '';
+    const off = v==null ? (!riderAllowed(rd.id) ? 'แบบประกันนี้แนบสัญญานี้ไม่ได้ (แนบได้เฉพาะสัญญาอุบัติเหตุ)' : S.age<a||S.age>b ? `ไม่รับประกันที่อายุนี้ (${rangeText([a,b],d)})` : d.auto ? (d.main() ? `ไม่มีอัตราสำหรับชำระเบี้ย ${d.main().yrs} ปี ที่อายุนี้ (โบรชัวร์มีอัตรา ${d.terms.join(', ')} ปี)` : 'ยังคำนวณเบี้ยแบบหลักไม่ได้') : (d.saCfg.snap ? saRangeText(d.saCfg) : `ทุนต้องอยู่ระหว่าง ${fmt0(d.saCfg.min)} – ${fmt0(d.saCfg.max)} บาท`)) : '';
     if(d.auto) el.parentElement.querySelector('small').textContent = d.th + (riderLabel(d,rd)?' · '+riderLabel(d,rd):'');
     el.className = off ? 'rp off' : 'rp'; el.textContent = off || `${money(v)} บาท/ปี`;
     if(d.saCfg && d.saCfg.list){
