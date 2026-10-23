@@ -473,7 +473,9 @@ const riderPosToSa = (c,pos) => c.snap ? c.snap[pos] : Math.round((c.min+(c.max-
 const planText = (d,n) => { const pl=d.plans[n-1]; return pl.detail ? `${pl.label} · ${pl.detail}` : `${pl.label} · ค่าห้อง ${pl.room} บาท/วัน`; };
 const planShort = (d,n) => d.plans[n-1].label;
 const riderLabel = (d,rd) => d.auto ? (m=>m?`ทุน ${fmt0(m.sa)} บาท (= เบี้ยแบบหลัก)`:'')(d.main()) : d.saCfg ? `${d.saText?d.saText(rd.sa):`ทุน ${fmt0(rd.sa)} บาท`}${d.plans?' '+(d.plans[rd.plan-1].short||d.plans[rd.plan-1].label):''}` : planShort(d,rd.plan);
-const S = {plan:PLANS[0], g:'f', term:20, age:30, sa:PLANS[0].saMin, riders:[{id:'st',plan:6}]};  // opens with Health Starter 1500 Balanced
+const S = {plan:PLANS[0], g:'f', term:20, age:30, sa:PLANS[0].saMin, riders:[]};
+/* rider picker opens on Health Starter 1500 Balanced; nothing is added until the user taps + เพิ่ม */
+let pickDefault = {id:'st', plan:'6'};
 const $ = id => document.getElementById(id);
 const saMinOf = (p,t) => typeof p.saMin==='function' ? p.saMin(t) : p.saMin;
 const saTopOf = p => p.saMax ?? p.sliderMax;
@@ -665,11 +667,11 @@ function render(){
 function renderRiders(){
   const free=RIDERS.filter(d=>riderAllowed(d.id)&&!S.riders.some(x=>x.id===d.id));
   const pick=$('riderPick'), pp=$('riderPlanPick'), add=$('riderAdd');
-  const keep=pick.value;
+  const keep=pickDefault ? pickDefault.id : pick.value;
   setHTML(pick, free.length ? groupHTML(RIDER_GROUPS, free, d=>`<option value="${d.id}">${d.name} – ${d.th}</option>`) : '<option value="">เพิ่มครบทุกสัญญาแล้ว</option>');
   if(free.some(d=>d.id===keep)) pick.value=keep;
   const cur=riderDef(pick.value);
-  const keepPlan=pp.value;
+  const keepPlan=pickDefault ? pickDefault.plan : pp.value; pickDefault=null;
   pp.hidden=!!(cur&&!cur.plans); $('riderSaNote').hidden=!pp.hidden;
   if(pp.hidden) $('riderSaNote').textContent= cur.auto ? 'ทุนเท่ากับเบี้ยแบบหลักต่อปี คิดให้อัตโนมัติ' : `ทุนเริ่มต้น ${fmt0(cur.saCfg.def)} บาท ปรับได้หลังกดเพิ่ม`;
   setHTML(pp, cur && cur.plans ? cur.plans.map(pl=>`<option value="${pl.n}">${pl.label}</option>`).join('') : '<option value="">–</option>');
