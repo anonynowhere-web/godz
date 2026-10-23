@@ -85,6 +85,10 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
 .tiersum li b{font-weight:600;color:var(--ink);text-align:right}
 .tiersum li.on{border-color:var(--accent);background:var(--accent-soft)}
 .tiersum li.on b{color:var(--accent)}
+.c-sa .seg{justify-self:start}
+.budnote{font-size:13px;color:var(--accent);font-weight:500}
+.numwrap.ro{background:var(--surface);border-style:dashed}
+.gone{display:none!important}
 .discnow{font-size:13px;color:var(--accent);font-weight:500}
 .discnow:empty{display:none}
 .rideradd{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center}
@@ -202,6 +206,12 @@ footer{font-size:12.5px;color:var(--muted);max-width:80ch}
 
       <div class="field tint c-sa">
         <p class="label"><span>จำนวนเงินเอาประกัน (ทุนประกัน)</span><span id="saRange"></span></p>
+        <div class="seg" id="saMode" role="group" aria-label="วิธีกำหนดทุนประกัน">
+          <button type="button" data-m="sa" aria-pressed="true">กำหนดทุนประกัน</button>
+          <button type="button" data-m="prem" aria-pressed="false">กำหนดเบี้ยที่จ่าย</button>
+        </div>
+        <div class="numwrap" id="budWrap" hidden><input id="budInput" type="text" inputmode="numeric" aria-label="เบี้ยที่ต้องการจ่ายต่อปี (บาท)"><em>บาท/ปี</em></div>
+        <div class="budnote" id="budNote" hidden></div>
         <div class="numwrap" id="saWrap"><input id="saInput" type="text" inputmode="numeric" aria-label="ทุนประกัน (บาท)"><em>บาท</em></div>
         <input id="saSlider" type="range" min="0" max="1000" step="1" aria-label="เลื่อนเลือกทุนประกัน">
         <div class="ticks"><span id="saLo"></span><span id="saHi"></span></div>
@@ -392,7 +402,7 @@ const riderPosToSa = (c,pos) => c.snap ? c.snap[pos] : Math.round((c.min+(c.max-
 const planText = (d,n) => { const pl=d.plans[n-1]; return pl.detail ? `${pl.label} · ${pl.detail}` : `${pl.label} · ค่าห้อง ${pl.room} บาท/วัน`; };
 const planShort = (d,n) => d.plans[n-1].label;
 const riderLabel = (d,rd) => d.saCfg ? `ทุน ${fmt0(rd.sa)} บาท${d.plans?' '+(d.plans[rd.plan-1].short||d.plans[rd.plan-1].label):''}` : planShort(d,rd.plan);
-const S = {plan:PLANS[0], g:'f', term:20, age:30, sa:PLANS[0].saMin, riders:[]};
+const S = {plan:PLANS[0], g:'f', term:20, age:30, sa:PLANS[0].saMin, riders:[], mode:'sa', budget:NaN, budNote:''};
 const $ = id => document.getElementById(id);
 const saMinOf = (p,t) => typeof p.saMin==='function' ? p.saMin(t) : p.saMin;
 const saTopOf = p => p.saMax ?? p.sliderMax;
@@ -466,6 +476,28 @@ function renderTiers(p,r){
   $('saDisc').textContent=msg;
 }
 
+/* budget mode: largest sum assured whose main-plan premium fits the yearly budget */
+function saFromBudget(){
+  const p=S.plan, B=S.budget, lo=saMinOf(p,S.term), hi=p.saMax||Infinity;
+  if(!(B>0)) return null;
+  const segs = tiersOf(p).length ? tiersOf(p) : [{from:lo,to:null}];
+  const step = p.step || 1000;
+  let best=null;
+  for(const x of segs){
+    const a=Math.max(x.from,lo), b=Math.min(x.to==null?Infinity:x.to,hi); if(a>b) continue;
+    const c=calc(p,S.term,S.g,S.age,a); if(!c || !(c.net>0)) continue;
+    let sa=Math.min(Math.floor(B/c.net*1000/step)*step, b);
+    while(sa>=a){ const y=calc(p,S.term,S.g,S.age,sa); if(y && y.prem<=B) break; sa-=step; }
+    if(sa>=a && (best==null || sa>best)) best=sa;
+  }
+  return best;
+}
+function applyBudget(){
+  const p=S.plan, lo=saMinOf(p,S.term), sa=saFromBudget();
+  if(sa!=null){ S.sa=sa; const c=calc(p,S.term,S.g,S.age,sa); S.budNote=`ได้ทุนประกัน ${fmt0(sa)} บาท · เบี้ยจริง ${money(c.prem)} บาท/ปี`; }
+  else { S.sa=lo; const c=calc(p,S.term,S.g,S.age,lo); S.budNote = !(S.budget>0) ? 'กรอกเบี้ยที่ต้องการจ่ายต่อปี' : c ? `เบี้ยต่ำสุดของแบบนี้ ${money(c.prem)} บาท/ปี (ทุน ${fmt0(lo)} บาท)` : ''; }
+}
+
 function validate(){
   const p=S.plan, lo=saMinOf(p,S.term); const errs=[];
   if(!(S.age>=p.ages[0] && S.age<=p.ages[1])) errs.push(`อายุที่รับประกันของแบบนี้คือ ${ageText(p.ages[0])} – ${p.ages[1]} ปี`);
@@ -506,11 +538,18 @@ function syncGender(){
 
 function render(){
   const p=S.plan;
+  if(S.mode==='prem') applyBudget();
   // inputs
   const ai=$('ageInput'), as=$('ageSlider');
   if(document.activeElement!==ai) ai.value=S.age;
   as.value=Math.min(p.ages[1],Math.max(p.ages[0],S.age)); paint(as);
   $('ageUnit').textContent = S.age===0 ? 'ปี (15 วัน)' : 'ปี';
+  const prem=S.mode==='prem';
+  $('saMode').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.m===S.mode)));
+  $('budWrap').hidden=!prem; $('budNote').hidden=!prem || !S.budNote; $('budNote').textContent=S.budNote;
+  if(prem && document.activeElement!==$('budInput')) $('budInput').value=isFinite(S.budget)?fmt0(S.budget):'';
+  $('saInput').readOnly=prem; $('saWrap').classList.toggle('ro',prem);
+  ['saSlider','saTiers'].forEach(id=>$(id).classList.toggle('gone',prem)); document.querySelector('.c-sa .ticks').classList.toggle('gone',prem);
   const si=$('saInput'), ss=$('saSlider');
   if(document.activeElement!==si) si.value=isFinite(S.sa)?fmt0(S.sa):'';
   ss.value=saToPos(S.sa); paint(ss);
@@ -661,6 +700,17 @@ $('terms').addEventListener('click',e=>{const b=e.target.closest('button'); if(!
 $('ageSlider').addEventListener('input',e=>{S.age=+e.target.value; render();});
 $('ageInput').addEventListener('input',e=>{const v=parseInt(e.target.value,10); S.age=isNaN(v)?NaN:v; render();});
 $('ageInput').addEventListener('blur',()=>render());
+$('saMode').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b||b.dataset.m===S.mode) return;
+  S.mode=b.dataset.m;
+  if(S.mode==='prem'){ const c=calc(S.plan,S.term,S.g,S.age,S.sa); S.budget = c ? Math.round(c.prem) : NaN; }
+  render(); if(S.mode==='prem') $('budInput').focus(); });
+$('budInput').addEventListener('input',e=>{
+  const digits=e.target.value.replace(/[^\d]/g,''); S.budget=digits?+digits:NaN;
+  const pos=e.target.selectionStart, before=e.target.value.length;
+  e.target.value=digits?fmt0(+digits):''; const d=e.target.value.length-before;
+  try{e.target.setSelectionRange(pos+d,pos+d);}catch(_){}
+  render();});
+$('budInput').addEventListener('blur',()=>render());
 $('saSlider').addEventListener('input',e=>{S.sa=posToSa(+e.target.value); render();});
 $('saInput').addEventListener('input',e=>{
   const digits=e.target.value.replace(/[^\d]/g,''); S.sa=digits?+digits:NaN;
