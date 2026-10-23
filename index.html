@@ -258,15 +258,20 @@ let rid = 0;
 function riderRow(r){
   const def = RIDERS.find(x => x.id === r.type);
   return `<div class="rider" data-k="${r.k}">
-    <div><label for="rt${r.k}">สัญญาเพิ่มเติม</label><select id="rt${r.k}" data-f="type">${RIDERS.map(x => `<option value="${x.id}"${x.id===r.type?" selected":""}>${x.name}</option>`).join("")}</select></div>
+    <div><label for="rt${r.k}">สัญญาเพิ่มเติม</label><select id="rt${r.k}" data-f="type">${RIDERS.map(x => `<option value="${x.id}"${x.id===r.type?" selected":""}${x.id!==r.type && riders.some(o => o.type===x.id)?" disabled":""}>${x.name}</option>`).join("")}</select></div>
     <div><label for="rp${r.k}">แผน</label><select id="rp${r.k}" data-f="plan">${def.plans.map(o => `<option${o===r.plan?" selected":""}>${o}</option>`).join("")}</select></div>
     <button type="button" class="rm" data-rm="${r.k}" aria-label="ลบสัญญาเพิ่มเติมนี้">×</button>
     <p class="warn" data-warn="${r.k}" hidden></p>
   </div>`;
 }
-function drawRiders(){ $("riders").innerHTML = riders.map(riderRow).join(""); }
+const freeRider = () => RIDERS.find(x => !riders.some(o => o.type === x.id));
+function drawRiders(){
+  $("riders").innerHTML = riders.map(riderRow).join("");
+  $("addRider").hidden = !freeRider();
+}
 $("addRider").onclick = () => {
-  riders.push({k: ++rid, type:"hbx", plan:"1,000/วัน"});
+  const d = freeRider(); if (!d) return;
+  riders.push({k: ++rid, type: d.id, plan: d.plans[0]});
   drawRiders(); render(); $("rp"+rid).focus();
 };
 $("riders").addEventListener("click", e => {
