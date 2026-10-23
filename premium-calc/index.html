@@ -483,7 +483,7 @@ function render(){
     const first=r.prem+rSum;
     $('sPrem').innerHTML=`${money(first)}<small>บาท</small>`;
     const gx = gtxt;
-    shareMsg = [`สรุปเบี้ยประกัน (Anonynowhere)`,
+    shareMsg = [`สรุปเบี้ยประกันจาก (Anonynowhere)`,
       `แบบ: ${p.name} – ${p.th}`,
       `ผู้เอาประกัน: ${gx} อายุ ${ageText(S.age)}`,
       `ทุนประกัน: ${fmt0(S.sa)} บาท`,
@@ -491,7 +491,7 @@ function render(){
       `เบี้ยแบบหลักรายปี: ${money(r.prem)} บาท`,
       ...rAdds.map(x=>`สัญญาเพิ่มเติม ${x.d.name} ${riderLabel(x.d,x.rd)}: ${money(x.v)} บาท/ปี`),
       ...(rAdds.length?[`เบี้ยรวมปีแรก: ${money(first)} บาท`]:[]),
-      `* ประมาณการจากอัตราเบี้ยมาตรฐาน เบี้ยจริงขึ้นกับการพิจารณารับประกัน`].join('\n');
+      `* ประมาณการจากอัตราเบี้ยมาตรฐาน เบี้ยจริงขึ้นกับการพิจารณารับประกัน`].join('\n\n');
     $('shLine').href = 'https://line.me/R/share?text=' + encodeURIComponent(shareMsg);
     $('shMail').href = 'mailto:?subject=' + encodeURIComponent(`สรุปเบี้ยประกัน ${p.name}`) + '&body=' + encodeURIComponent(shareMsg);
     $('shareBox').hidden=false;
