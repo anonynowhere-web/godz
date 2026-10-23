@@ -249,7 +249,7 @@ $("saR").addEventListener("input", e => { st.sa = Math.max(+e.target.value, curP
 
 const MODES = {"12":{f:1,t:"รายปี",u:"บาท/ปี"},"6":{f:0.51,t:"ราย 6 เดือน",u:"บาท/6 เดือน"},"3":{f:0.27,t:"ราย 3 เดือน",u:"บาท/3 เดือน"},"1":{f:0.09,t:"รายเดือน",u:"บาท/เดือน"}};
 const RIDERS = [
-  {id:"hbx", name:"AIA HB Extra", plans:["1,000/วัน","2,000/วัน","3,000/วัน","4,000/วัน","5,000/วัน"], maxAge:70}
+  {id:"hbx", name:"AIA HB Extra", plans:Array.from({length:10},(_,i)=>((i+1)*1000).toLocaleString("en-US")+"/วัน"), maxAge:70}
 ];
 // อัตราเบี้ยสัญญาเพิ่มเติม: RIDER_RATES[id](sex, age, plan) → เบี้ยรายปี หรือ null ถ้ายังไม่มีตาราง
 // AIA HB Extra: อัตราเบี้ยมาตรฐานรายปีต่อค่าชดเชยรายวัน 100 บาท (โบรชัวร์ SU0215400)
