@@ -610,7 +610,7 @@ const RIDERS=[
   bands:[[0,20],[21,35],[36,40],[41,45],[46,50],[51,55],[56,60],[61,65],[66,70]],
   rates:{m:[360,210,230,250,290,350,420,510,710], f:[325,280,290,320,370,400,460,490,600]},
   premium(g,age,_,sa){const i=this.bands.findIndex(([a,b])=>age>=a&&age<=b); return i<0?null:Math.round(this.rates[g][i]*sa/100*100)/100;}},
- {id:'ci', color:'#b45309', name:'CI Plus', th:'คุ้มครองโรคร้ายแรง 44 โรค/การรักษา', ages:[0,75], saCfg:{min:100000,max:25000000,step:100000,def:100000},
+ {id:'ci', color:'#b45309', name:'CI Plus', th:'คุ้มครองโรคร้ายแรง 44 โรค/การรักษา', ages:[0,75], saCfg:{min:100000,max:25000000,step:100000,def:1000000},
   bands:[[0,15],[16,20],[21,25],[26,30],[31,35],[36,40],[41,45],[46,50],[51,55],[56,60],[61,65],[66,70],[71,75]],
   rates:{m:[2.62,2.76,2.89,3.16,3.84,5.23,10.19,15.92,25.38,42.31,61.04,81.76,112.64], f:[2.27,2.06,2.15,2.55,3.53,4.6,6.38,10.17,15.92,26.09,35.81,51.71,73.52]},
   premium(g,age,_,sa){const i=this.bands.findIndex(([a,b])=>age>=a&&age<=b); return i<0?null:Math.round(this.rates[g][i]*sa/10)/100;}},
@@ -675,7 +675,7 @@ const riderPosToSa = (c,pos) => c.snap ? c.snap[pos] : Math.round((c.min+(c.max-
 const planText = (d,n) => { const pl=d.plans[n-1]; return pl.detail ? `${pl.label} · ${pl.detail}` : `${pl.label} · ค่าห้อง ${pl.room} บาท/วัน`; };
 const planShort = (d,n) => d.plans[n-1].label;
 const riderLabel = (d,rd) => d.auto ? (m=>m?`ทุน ${fmt0(m.sa)} บาท (= เบี้ยแบบหลัก)`:'')(d.main()) : d.saCfg ? `${d.saText?d.saText(rd.sa):`ทุน ${fmt0(rd.sa)} บาท`}${d.plans?' '+(d.plans[rd.plan-1].short||d.plans[rd.plan-1].label):''}` : planShort(d,rd.plan);
-const S = {plan:PLANS[0], g:'f', term:20, age:30, sa:Math.max(150000,PLANS[0].saMin), riders:[]};
+const S = {plan:PLANS[0], g:'f', term:20, age:30, sa:Math.max(150000,PLANS[0].saMin), riders:[{id:'ci', plan:1, sa:1000000}]};
 /* rider picker opens on Health Starter 1500 Balanced; nothing is added until the user taps + เพิ่ม */
 let pickDefault = {id:'ci', plan:null};
 const $ = id => document.getElementById(id);
