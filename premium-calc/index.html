@@ -439,6 +439,20 @@ body{padding-bottom:84px}
 .notes{font-size:12.5px}
 .mbar{min-height:48px}
 .mbar b{font-size:18px;font-weight:500}
+/* Each section its own colour: soft tinted band, coloured heading and left bar */
+.panel{gap:8px}
+.panel>.tint,.panel .row2>.tint,:root[data-theme="dark"] .panel>.tint,:root[data-theme="dark"] .panel .row2>.tint{background:color-mix(in srgb,var(--sc) 9%,var(--bg));border:0;border-left:3px solid var(--sc);border-radius:10px;padding:10px 12px}
+:root[data-theme="dark"] .panel>.tint,:root[data-theme="dark"] .panel .row2>.tint{background:color-mix(in srgb,var(--sc) 14%,var(--bg))}
+.tint>.label span:first-child,:root[data-theme="dark"] .tint>.label span:first-child{color:color-mix(in srgb,var(--sc) 80%,var(--ink));font-weight:500}
+.tint>.label span:first-child::before{display:none}
+.tint{--line:color-mix(in srgb,var(--sc) 22%,#ffffff);--track:color-mix(in srgb,var(--sc) 20%,#ffffff)}
+:root[data-theme="dark"] .tint{--line:color-mix(in srgb,var(--sc) 30%,#111);--track:color-mix(in srgb,var(--sc) 30%,#111)}
+.tint .numwrap,.tint .planselect,.tint .seg,.tint .stp,.tint .chips button,.tint .tiers button,.tint .riders li{background:var(--surface)}
+.stp{color:var(--sc,var(--muted))}
+.tint .addbtn{background:var(--sc);border-color:var(--sc);color:#fff}
+.slip{--sc:#475569;background:color-mix(in srgb,#475569 6%,var(--bg))!important;border-left:3px solid #475569!important;border-radius:10px!important;padding:26px 12px 12px!important}
+.slip::before{top:8px;left:12px}
+:root[data-theme="dark"] .slip{--sc:#94a3b8;background:color-mix(in srgb,#94a3b8 10%,var(--bg))!important;border-left-color:#94a3b8!important}
 </style>
 </head>
 <body>
