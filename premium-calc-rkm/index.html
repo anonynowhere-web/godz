@@ -542,6 +542,8 @@ footer,.notes{color:var(--ink);opacity:.8}
 .advice .adv-tap{font-size:12px;color:#9a4a00}
 /* RKM sub-program badge */
 .brand h1 .subname{display:inline-block;vertical-align:middle;margin-left:6px;padding:4px 10px;border-radius:999px;font-size:.5em;font-weight:600;letter-spacing:0;color:#fff;background:linear-gradient(135deg,#30b158,#0a9fcf)}
+/* RKM: no riders */
+.field.c-rider{display:none!important}
 </style>
 </head>
 <body>
@@ -791,6 +793,10 @@ const PLAN_GROUPS=[['ประกันตลอดชีพ',['p20','p1015','pl
 const RIDER_GROUPS=[['ค่ารักษาพยาบาล',['hh','hs','st','hk','ic']],['ค่าชดเชยรายวัน',['hbx']],['โรคร้ายแรง',['ci','mpci','cc','hero']],['อุบัติเหตุ',['ai','add','adb']],['ทุพพลภาพ / ยกเว้นเบี้ย',['tpd','wpci']]];
 const groupHTML=(groups,items,opt)=>groups.map(([h,ids])=>{ const xs=ids.map(id=>items.find(x=>x.id===id)).filter(Boolean); return xs.length?`<optgroup label="${h}">${xs.map(opt).join('')}</optgroup>`:''; }).join('');
 const riderDef = id => RIDERS.find(x=>x.id===id);
+/* RKM: 20 Pay Life and Pay Life Plus (20-year pay) only, no riders */
+PLANS.splice(0,PLANS.length,...PLANS.filter(p=>p.id==='p20'||p.id==='plus'));
+Object.assign(PLANS.find(p=>p.id==='plus'),{terms:[20],th:'ตลอดชีพ พลัส ชำระเบี้ย 20 ปี'});
+RIDERS.splice(0,RIDERS.length);
 const planAges = (d,n) => (n && d.plans && d.plans[n-1] && d.plans[n-1].ages) || d.ages;
 const rangeText = ([a,b],d) => `${a===0?(d&&d.ageLo||'15 วัน'):a}–${b} ปี`;
 const saOk = (d,sa) => !d.saCfg || (d.saCfg.snap ? d.saCfg.snap.includes(sa) : isFinite(sa) && sa>=d.saCfg.min && sa<=d.saCfg.max);
