@@ -368,6 +368,44 @@ button,a,select,input{-webkit-tap-highlight-color:transparent;touch-action:manip
   body{padding-bottom:84px}
   #slip{scroll-margin-top:12px}
 }
+/* Ultra-minimal, tight: no cards, hairline dividers, compact spacing */
+body{padding-top:8px}
+.wrap{gap:10px}
+.brand{padding-bottom:0;margin:0}
+.brand h1{font-size:clamp(22px,4vw,26px);margin:0}
+.themebtn{min-height:44px;padding:0 12px}
+.panel{padding:22px 0 0;gap:0}
+.panel::before{top:0;font-size:12px}
+.panel>.tint,.panel .row2>.tint,:root[data-theme="dark"] .panel>.tint,:root[data-theme="dark"] .panel .row2>.tint{background:transparent;border:0;border-bottom:1px solid var(--line);border-radius:0;padding:10px 0}
+.row2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+.row2>.tint{flex:none;min-width:0}
+.field{gap:6px}
+.label{margin:0 0 4px}
+.ticks{display:none}
+input[type=range]{height:32px;margin:0}
+.stepper{grid-template-columns:48px minmax(0,1fr) 48px;gap:6px}
+.stp,.numwrap,.planselect,.riders select,.seg button,.addbtn{min-height:48px}
+.chips{gap:6px;margin:0}
+.chips button{min-height:44px;padding:0 12px}
+.tiers{gap:6px}
+.tiers button{padding:6px 10px}
+.discnow{margin:0}
+.rideradd{gap:6px}
+.riders{gap:6px;margin-top:6px}
+.riders li{padding:8px 10px}
+.msg{margin-top:8px}
+.slip{background:transparent!important;border:0!important;border-radius:0!important;padding:22px 0 0!important;gap:8px}
+.slip::before{top:0;left:0}
+.slip .big,:root[data-theme="dark"] .slip .big{padding:2px 0 10px}
+.slip dl>*{padding:6px 0}
+.tierbox,.share,.compare{margin-top:4px}
+.share{gap:6px}
+footer{margin-top:12px}
+@media (max-width:820px){
+  .seg button,.planselect,.riders select,.addbtn{min-height:48px}
+  input[type=range]{height:36px}
+  body{padding-bottom:80px}
+}
 </style>
 </head>
 <body>
