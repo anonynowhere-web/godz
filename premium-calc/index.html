@@ -290,6 +290,72 @@ footer{font-size:14px}
 .panel>*,.row2>*,.field>*{min-width:0}
 .planselect,.riders select{min-width:0;text-overflow:ellipsis}
 @media (max-width:460px){.tiers{grid-template-columns:minmax(0,1fr)}.tiers button{grid-template-columns:1fr auto;align-items:center;column-gap:10px}.tiers button span{grid-column:1/-1}}
+/* Windows 11 (Fluent) look: bloom wallpaper, Mica-style windows with title bars, 4–8px corners, Segoe type */
+:root{
+  --pop-ink:transparent; --bg:#dfe9f7; --surface:#ffffff; --ink:#1b1b1b; --muted:#5f5f5f; --line:#e5e5e5;
+  --accent:#0067c0; --accent-soft:#e5f1fb; --track:#d6d6d6; --field:#ffffff; --win-mica:rgba(243,243,243,.86); --win-bar:rgba(255,255,255,.55); --win-stroke:rgba(0,0,0,.09);
+  --display:"Segoe UI Variable Display","Segoe UI Variable Text","Segoe UI","IBM Plex Sans Thai",system-ui,sans-serif;
+  --body:"Segoe UI Variable Text","Segoe UI","IBM Plex Sans Thai",system-ui,sans-serif;
+}
+:root[data-theme="dark"]{--pop-ink:transparent; --bg:#1c1c1c; --surface:#2b2b2b; --ink:#ffffff; --muted:#c5c5c5; --line:#3a3a3a; --accent:#4cc2ff; --accent-soft:#1f3a4d; --track:#5a5a5a; --field:#2d2d2d; --win-mica:rgba(32,32,32,.86); --win-bar:rgba(44,44,44,.6); --win-stroke:rgba(255,255,255,.08)}
+body{font-family:var(--body);background:
+  radial-gradient(70% 60% at 85% 20%,#7fb2ff 0,transparent 60%),
+  radial-gradient(60% 55% at 15% 85%,#a6c8ff 0,transparent 60%),
+  linear-gradient(160deg,#eaf1fb 0%,#cfe0f8 55%,#b9d1f3 100%);min-height:100vh}
+:root[data-theme="dark"] body{background:
+  radial-gradient(70% 60% at 85% 20%,#0d3b78 0,transparent 60%),
+  radial-gradient(60% 55% at 15% 85%,#122d55 0,transparent 60%),#141414}
+.brand h1{font-family:var(--display);font-weight:600;color:var(--ink);text-shadow:none;letter-spacing:0;font-size:clamp(28px,5vw,38px)}
+.themebtn{border:1px solid var(--win-stroke);box-shadow:0 2px 6px rgba(0,0,0,.08);border-radius:6px;background:var(--win-mica);color:var(--ink);backdrop-filter:blur(20px)}
+:root[data-theme="dark"] .themebtn{background:var(--win-mica);color:var(--ink);border-color:var(--win-stroke)}
+/* windows */
+.panel{position:relative;border:1px solid var(--win-stroke);border-radius:8px;background:var(--win-mica);-webkit-backdrop-filter:blur(30px) saturate(1.4);backdrop-filter:blur(30px) saturate(1.4);box-shadow:0 12px 40px -8px rgba(0,0,0,.28),0 2px 6px rgba(0,0,0,.08);padding:52px 14px 16px;gap:10px}
+.panel::before{content:attr(data-title);position:absolute;inset:0 0 auto 0;height:40px;display:flex;align-items:center;padding:0 14px;font-size:14px;font-family:var(--body);color:var(--ink);background:var(--win-bar);border-bottom:1px solid var(--win-stroke);border-radius:8px 8px 0 0}
+.panel::after{content:"—    ☐    ✕";position:absolute;top:0;right:0;height:40px;display:flex;align-items:center;padding:0 16px;font-size:13px;letter-spacing:.02em;color:var(--muted);pointer-events:none}
+/* settings-style cards, one accent per field */
+.c-plan{--sc:#0067c0}.c-gender{--sc:#8764b8}.c-term{--sc:#107c10}.c-age{--sc:#ca5010}.c-sa{--sc:#c239b3}.c-rider{--sc:#038387}
+:root[data-theme="dark"] .c-plan{--sc:#4cc2ff}:root[data-theme="dark"] .c-gender{--sc:#b4a0ff}:root[data-theme="dark"] .c-term{--sc:#6ccb5f}:root[data-theme="dark"] .c-age{--sc:#f7894a}:root[data-theme="dark"] .c-sa{--sc:#ee8fe4}:root[data-theme="dark"] .c-rider{--sc:#58d7db}
+.tint{--accent:var(--sc);--accent-soft:color-mix(in srgb,var(--sc) 12%,var(--surface))}
+:root[data-theme="dark"] .tint{--accent:var(--sc);--accent-ink:#000}
+.panel>.tint,.panel .row2>.tint,:root[data-theme="dark"] .panel>.tint,:root[data-theme="dark"] .panel .row2>.tint{background:var(--surface);border:1px solid var(--win-stroke);border-left:4px solid var(--sc);border-radius:6px;padding:12px 14px 14px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.tint>.label span:first-child,:root[data-theme="dark"] .tint>.label span:first-child{background:none;color:var(--accent);padding:0;border-radius:0;box-shadow:none;font-family:var(--display);font-weight:600}
+.tint>.label span:first-child::before,:root[data-theme="dark"] .tint>.label span:first-child::before{width:12px;height:12px;border-radius:3px;background:var(--accent)}
+/* controls */
+.planselect,.riders select,.c-plan .planselect,.numwrap{border:1px solid #d1d1d1;border-bottom:2px solid #8a8a8a;border-radius:4px;box-shadow:none;background:var(--field);color:var(--ink);font-family:var(--body);font-weight:400}
+:root[data-theme="dark"] .planselect,:root[data-theme="dark"] .riders select,:root[data-theme="dark"] .numwrap{border-color:#444;border-bottom-color:#9a9a9a}
+.c-plan .planselect{font-weight:600;color:var(--ink)}
+.planselect:focus-visible,.numwrap:focus-within{border-bottom-color:var(--accent);outline:none}
+.seg{border:1px solid #d1d1d1;border-radius:6px;background:var(--field);box-shadow:none;padding:3px}
+:root[data-theme="dark"] .seg{border-color:#444}
+.seg button{font-family:var(--body);font-weight:500;border-radius:4px;box-shadow:none}
+.seg button[aria-pressed="true"],:root[data-theme="dark"] .seg button[aria-pressed="true"]{background:var(--accent);color:#fff;box-shadow:none}
+:root[data-theme="dark"] .seg button[aria-pressed="true"]{color:#000}
+input[type=range]::-webkit-slider-runnable-track{border:0;height:4px;border-radius:2px}
+input[type=range]::-moz-range-track{border:0;height:4px;border-radius:2px}
+input[type=range]::-webkit-slider-thumb{width:28px;height:28px;margin-top:-12px;background:var(--accent);border:6px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.15),0 1px 3px rgba(0,0,0,.2)}
+input[type=range]::-moz-range-thumb{width:18px;height:18px;background:var(--accent);border:6px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.15)}
+:root[data-theme="dark"] input[type=range]::-webkit-slider-thumb{border-color:#454545}
+.tiers button,.tiersum li{border:1px solid var(--win-stroke);border-radius:6px;background:var(--surface);box-shadow:none}
+.tiers button.on,.tiersum li.on{background:var(--accent-soft);border:1px solid var(--accent);box-shadow:inset 3px 0 0 var(--accent)}
+.tiers button.on,.tiers button.on b,.tiers button.on span,.tiersum li.on,.tiersum li.on span{color:var(--ink)}
+.tiers button.on b,.tiersum li.on b{color:var(--accent)}
+.tiers button.on small,.tiersum li.on b small{color:var(--muted)}
+:root[data-theme="dark"] .tiers button.on,:root[data-theme="dark"] .tiers button.on span{color:var(--ink)}
+:root[data-theme="dark"] .tiers button.on b{color:var(--accent)}
+:root[data-theme="dark"] .tiers button.on small{color:var(--muted)}
+.addbtn{border:1px solid rgba(0,0,0,.1);border-radius:4px;box-shadow:none;font-family:var(--body);font-weight:600}
+.addbtn:active,.sh:active,.seg button:active,.themebtn:active{transform:none;box-shadow:none;filter:brightness(.92)}
+.riders li{border:1px solid var(--win-stroke);border-left:4px solid var(--accent);border-radius:6px;background:var(--surface);box-shadow:none}
+.riders li b{font-family:var(--display);color:var(--accent)}
+.rm{border:1px solid transparent;border-radius:4px;background:transparent}
+.rm:hover{background:#c42b1c;color:#fff}
+.slip .big{background:var(--accent);border:0;border-radius:6px;box-shadow:none;padding:14px 16px}
+.slip .big .k,.slip .big .v,.slip .big .v small,.slip .big .daily{color:#fff}
+:root[data-theme="dark"] .slip .big{background:#0067c0}
+.slip h2{font-family:var(--display);font-weight:600}
+.sh{border:1px solid rgba(0,0,0,.08);border-radius:4px;box-shadow:none;font-family:var(--body);font-weight:600}
+.sh-line{background:#06c755}.sh-mail{background:#0067c0}.sh-copy{background:#5c2d91}
+footer{color:var(--ink);text-shadow:none}
 </style>
 </head>
 <body>
@@ -300,7 +366,7 @@ footer{font-size:14px}
   </header>
 
   <div class="grid">
-    <section class="panel" aria-label="ข้อมูลผู้เอาประกัน">
+    <section class="panel" aria-label="ข้อมูลผู้เอาประกัน" data-title="ข้อมูลผู้เอาประกัน">
       <div class="tint c-plan">
         <p class="label"><span>แบบประกัน</span></p>
         <select id="plans" class="planselect" aria-label="เลือกแบบประกัน"></select>
@@ -352,7 +418,7 @@ footer{font-size:14px}
       <div class="msg" id="msg" hidden></div>
     </section>
 
-    <aside class="panel slip" aria-live="polite">
+    <aside class="panel slip" aria-live="polite" data-title="สรุปเบี้ยประกัน">
       <div>
         <h2 id="sName"></h2>
         <div class="sub" id="sSub"></div>
