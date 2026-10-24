@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <style>[hidden]{display:none!important}img{max-width:100%}body{margin:0}#sDetail dd.net{font-weight:700;color:var(--accent)}
 </style>
-<title>Anony Lite</title>
+<title>Anony</title>
 <link rel="icon" type="image/svg+xml" href="../20pln/icon.svg">
 <link rel="icon" type="image/png" sizes="180x180" href="../20pln/apple-touch-icon.png">
 <link rel="apple-touch-icon" href="../20pln/apple-touch-icon.png">
@@ -526,8 +526,8 @@ footer,.notes{color:var(--ink);opacity:.8}
 .mbar,:root[data-theme="dark"] .mbar{background:rgba(20,20,24,.72);-webkit-backdrop-filter:blur(24px) saturate(1.6);backdrop-filter:blur(24px) saturate(1.6);border:1px solid rgba(255,255,255,.15);border-radius:999px;color:#fff;box-shadow:0 10px 30px -12px rgba(0,0,0,.5)}
 .mbar b{color:#fff}
 :root{color-scheme:light}
-/* Lite: base plan only, no riders, no detail tables or sharing */
-.c-rider,#sDetail,#sTiers,#shareBox,#cmpBox,#sNotes,#saTiers{display:none!important}
+/* Lite: no detail tables or sharing */
+#sDetail,#sTiers,#shareBox,#cmpBox,#sNotes,#saTiers{display:none!important}
 .slip .big{margin-bottom:0}
 </style>
 </head>
@@ -777,6 +777,9 @@ const PLAN_GROUPS=[['ประกันตลอดชีพ',['p20','p1015','pl
 const RIDER_GROUPS=[['ค่ารักษาพยาบาล',['hh','hs','st','hk','ic']],['ค่าชดเชยรายวัน',['hbx']],['โรคร้ายแรง',['ci','mpci','cc','hero']],['อุบัติเหตุ',['ai','add','adb']],['ทุพพลภาพ / ยกเว้นเบี้ย',['tpd','wpci']]];
 const groupHTML=(groups,items,opt)=>groups.map(([h,ids])=>{ const xs=ids.map(id=>items.find(x=>x.id===id)).filter(Boolean); return xs.length?`<optgroup label="${h}">${xs.map(opt).join('')}</optgroup>`:''; }).join('');
 const riderDef = id => RIDERS.find(x=>x.id===id);
+/* this version: 20 Pay Life and CI Plus only */
+PLANS.splice(0,PLANS.length,...PLANS.filter(p=>p.id==='p20'));
+RIDERS.splice(0,RIDERS.length,...RIDERS.filter(d=>d.id==='ci'));
 const planAges = (d,n) => (n && d.plans && d.plans[n-1] && d.plans[n-1].ages) || d.ages;
 const rangeText = ([a,b],d) => `${a===0?(d&&d.ageLo||'15 วัน'):a}–${b} ปี`;
 const saOk = (d,sa) => !d.saCfg || (d.saCfg.snap ? d.saCfg.snap.includes(sa) : isFinite(sa) && sa>=d.saCfg.min && sa<=d.saCfg.max);
