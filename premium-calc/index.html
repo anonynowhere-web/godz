@@ -407,6 +407,38 @@ footer{margin-top:12px}
   input[type=range]{height:36px}
 }
 body{padding-bottom:84px}
+/* Slim, easy to scan: lighter weights, thinner controls, no duplicate tier list in the summary */
+.stp,.numwrap,.planselect,.riders select,.seg button,.addbtn{min-height:44px}
+.stepper{grid-template-columns:44px minmax(0,1fr) 44px}
+.stp{font-size:20px;font-weight:300;color:var(--muted)}
+.numwrap input{font-size:18px;padding:6px 0;font-weight:400}
+.planselect,.riders select{font-size:16px}
+.c-plan .planselect{font-weight:400}
+.seg button,.seg button[aria-pressed="true"],:root[data-theme="dark"] .seg button[aria-pressed="true"]{font-weight:400}
+.addbtn{font-weight:400;padding:0 16px}
+.chips button{min-height:44px;font-size:14px;padding:0 12px}
+.chips button[aria-pressed="true"]{font-weight:400}
+.tint>.label span:first-child,:root[data-theme="dark"] .tint>.label span:first-child{font-weight:400}
+.tiers button{min-height:44px;padding:4px 10px;border-radius:8px;font-size:13px}
+.tiers button b{font-weight:500}
+.tiers button small{font-size:11.5px}
+.discnow{font-size:14px}
+.riders li{padding:6px 10px}
+.slip h2{font-size:18px;font-weight:500}
+.slip .sub{font-size:13px}
+.slip .big .v{font-size:clamp(30px,6vw,38px);font-weight:500;letter-spacing:-.01em}
+.slip .big .k{font-size:13px;font-weight:400}
+.slip dl{font-size:15px}
+.slip dl>*{padding:5px 0}
+.slip dd b,.slip dd strong{font-weight:500}
+.tierbox .tiersum,.tierbox .tiersum-h{display:none}
+.tiersum-save{font-size:14px;margin:0}
+.tiersum-save b{font-weight:500}
+.sh{min-height:44px;font-weight:400;font-size:15px}
+.compare table{font-size:14px}
+.notes{font-size:12.5px}
+.mbar{min-height:48px}
+.mbar b{font-size:18px;font-weight:500}
 </style>
 </head>
 <body>
