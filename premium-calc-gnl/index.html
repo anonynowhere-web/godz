@@ -530,6 +530,20 @@ footer,.notes{color:var(--ink);opacity:.8}
 #sDetail,#sTiers,#shareBox,#cmpBox,#sNotes,#saTiers{display:none!important}
 .slip .big{margin-bottom:0}
 .brand h1 .subname{display:inline-block;vertical-align:middle;margin-left:6px;padding:4px 10px;border-radius:999px;font-size:.5em;font-weight:600;letter-spacing:0;color:#fff;background:linear-gradient(135deg,#0a84ff,#ff375f)}
+
+/* SA upgrade advice: higher SA tiers that unlock a discount, tap to apply */
+.advice{display:grid;gap:8px;margin-top:10px;padding:12px;border-radius:22px;background:color-mix(in srgb,#ff9f0a 12%,#fff);border:1px solid color-mix(in srgb,#ff9f0a 38%,transparent)}
+.advice:empty{display:none}
+.advice h3{margin:0;font-size:14px;font-weight:600;color:#9a4a00;display:flex;align-items:center;gap:8px}
+.advice h3::before{content:"";width:22px;height:22px;flex:none;border-radius:50%;background:#ff9f0a url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"%3E%3Cpath fill="none" stroke="%23fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" d="M12 19V6M6 11l6-6 6 6"/%3E%3C/svg%3E') center/14px no-repeat}
+.advice ul{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.advice button{all:unset;box-sizing:border-box;cursor:pointer;display:grid;gap:2px;width:100%;min-height:44px;padding:9px 12px;border-radius:16px;background:#fff;border:1px solid color-mix(in srgb,#ff9f0a 30%,transparent);font-size:13.5px;line-height:1.4;color:var(--ink)}
+.advice button:hover{border-color:#ff9f0a}
+.advice button:focus-visible{outline:2px solid #ff9f0a;outline-offset:2px}
+.advice button b{font-weight:600}
+.advice .adv-save{color:#b45309;font-weight:500}
+.advice small{font-size:12px;color:var(--muted)}
+.advice .adv-tap{font-size:12px;color:#9a4a00}
 </style>
 </head>
 <body>
@@ -603,6 +617,7 @@ footer,.notes{color:var(--ink);opacity:.8}
         <span class="v" id="sPrem">–</span>
         <span class="daily" id="sDaily"></span>
       </div>
+      <div class="advice" id="sAdvice" aria-live="polite"></div>
       <dl id="sDetail"></dl>
       <div class="tierbox" id="sTiers"></div>
       <div class="share" id="shareBox">
@@ -866,6 +881,19 @@ function tierSummary(p,r){
     text:[['ส่วนลดตามทุนประกัน:', ...t.map(x=>`• ${tierRange(x)}: ${tierBaht(p,x)}${tierRate(x)?` (${tierRate(x)})`:''}${on(x)?' ✓ (ระดับที่ได้)':''}`)].join('\n'), save>0?saveText(r):'ทุนนี้ยังไม่ได้ส่วนลด']
   };
 }
+/* advice: every higher discount tier, with its discount and the extra premium it costs */
+function adviceHTML(p,r){
+  if(!r) return '';
+  const up=tiersOf(p).filter(x=>x.from>S.sa && (!p.saMax || x.from<=p.saMax));
+  const li=up.map(x=>{
+    const r2=calc(p,S.term,S.g,S.age,x.from); if(!r2) return '';
+    const disc=Math.round((r2.base*x.from/1000-r2.prem)*100)/100; if(disc<=0.004) return '';
+    const dp=Math.round((r2.prem-r.prem)*100)/100, per=dp/((x.from-S.sa)/1000);
+    const cost = dp<=0 ? `เบี้ยกลับถูกลง ${money(-dp)} บาท/ปี` : `เบี้ยเพิ่ม ${money(dp)} บาท/ปี`;
+    return `<li><button type="button" data-sa="${x.from}"><span>เพิ่มทุนเป็น <b>${fmt0(x.from)}</b> บาท <small>(เพิ่ม ${fmt0(x.from-S.sa)})</small></span><span class="adv-save">ได้ส่วนลด ${money(disc)} บาท/ปี · ${cost}</span>${dp>0?`<small>ทุนส่วนที่เพิ่มตกทุน 1,000 ละ ${fmt2(per)} บาท จากอัตราปกติ ${fmt2(r.net)}</small>`:''}</button></li>`;
+  }).join('');
+  return li ? `<h3>แนะนำ: เพิ่มทุนเพื่อรับส่วนลด</h3><ul>${li}</ul><span class="adv-tap">แตะเพื่อเปลี่ยนเป็นทุนนี้</span>` : '';
+}
 function renderTiers(p,r){
   const t=tiersOf(p), sa=S.sa;
   setHTML($('saTiers'), t.map(x=>`<button type="button" data-sa="${x.from}"><span>${tierRange(x)}</span><b>${tierBaht(p,x)}</b><small>${tierRate(x)}</small></button>`).join(''));
@@ -950,7 +978,7 @@ function render(){
   $('sPremK').textContent = rAdds.length ? 'เบี้ยรวมปีแรก (แบบหลัก + สัญญาเพิ่มเติม)' : 'เบี้ยประกันรายปี';
   if(!r){
     $('sPrem').innerHTML='–'; $('shareBox').hidden=true; $('sDaily').textContent='ปรับอายุหรือทุนประกันให้อยู่ในเงื่อนไขของแบบนี้';
-    $('sDetail').innerHTML=''; $('sTiers').innerHTML=''; $('cmp').innerHTML=''; $('cmpBox').hidden=true;
+    $('sDetail').innerHTML=''; $('sAdvice').innerHTML=''; $('sTiers').innerHTML=''; $('cmp').innerHTML=''; $('cmpBox').hidden=true;
   } else {
     const first=r.prem+rSum;
     $('sPrem').innerHTML=`${money(first)}<small>บาท</small>`;
@@ -980,6 +1008,7 @@ function render(){
     if(p.extra) rows.push(...p.extra(r,S.g,S.sa));
     $('sDetail').innerHTML=rows.map(([k,v,c])=>`<dt>${k}</dt><dd${c?` class="${c}"`:''}>${v}</dd>`).join('');
     $('sTiers').innerHTML=tierSummary(p,r).html;
+    $('sAdvice').innerHTML=adviceHTML(p,r);
     const many=p.terms.length>1; $('cmpBox').hidden=!many;
     if(many) $('cmp').innerHTML=p.terms.map(t=>{
       const lo=saMinOf(p,t); if(S.sa<lo) return `<tr><td>${termLabel(t)}</td><td colspan="2">ทุนขั้นต่ำ ${fmt0(lo)}</td></tr>`;
@@ -1096,6 +1125,7 @@ document.querySelectorAll('.stp').forEach(b=>b.addEventListener('click',()=>{
   render();
 }));
 $('saChips').addEventListener('click',e=>{const b=e.target.closest('button'); if(b){S.sa=+b.dataset.sa; render();}});
+$('sAdvice').addEventListener('click',e=>{const b=e.target.closest('button'); if(b){S.sa=+b.dataset.sa; render();}});
 $('saTiers').addEventListener('click',e=>{const b=e.target.closest('button'); if(b){S.sa=+b.dataset.sa; render();}});
 
 $('shCopy').addEventListener('click',()=>{
