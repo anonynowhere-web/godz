@@ -613,7 +613,7 @@ const planShort = (d,n) => d.plans[n-1].label;
 const riderLabel = (d,rd) => d.auto ? (m=>m?`ทุน ${fmt0(m.sa)} บาท (= เบี้ยแบบหลัก)`:'')(d.main()) : d.saCfg ? `${d.saText?d.saText(rd.sa):`ทุน ${fmt0(rd.sa)} บาท`}${d.plans?' '+(d.plans[rd.plan-1].short||d.plans[rd.plan-1].label):''}` : planShort(d,rd.plan);
 const S = {plan:PLANS[0], g:'f', term:20, age:30, sa:Math.max(150000,PLANS[0].saMin), riders:[]};
 /* rider picker opens on Health Starter 1500 Balanced; nothing is added until the user taps + เพิ่ม */
-let pickDefault = {id:'st', plan:'6'};
+let pickDefault = {id:'ci', plan:null};
 const $ = id => document.getElementById(id);
 const saMinOf = (p,t) => typeof p.saMin==='function' ? p.saMin(t) : p.saMin;
 const saTopOf = p => p.saMax ?? p.sliderMax;
