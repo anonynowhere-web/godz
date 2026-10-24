@@ -453,6 +453,39 @@ body{padding-bottom:84px}
 .slip{--sc:#475569;background:color-mix(in srgb,#475569 6%,var(--bg))!important;border-left:3px solid #475569!important;border-radius:10px!important;padding:26px 12px 12px!important}
 .slip::before{top:8px;left:12px}
 :root[data-theme="dark"] .slip{--sc:#94a3b8;background:color-mix(in srgb,#94a3b8 10%,var(--bg))!important;border-left-color:#94a3b8!important}
+/* Plain HTML look: black on white, default serif type, no colour anywhere */
+:root,:root[data-theme="dark"]{--bg:#fff;--surface:#fff;--ink:#000;--muted:#000;--line:#000;--accent:#000;--accent-soft:#fff;--track:#000;--field:#fff;--fill:#fff;--sep:#000;
+  --display:"Times New Roman",Times,"Noto Serif Thai",serif;--body:"Times New Roman",Times,"Noto Serif Thai",serif;--mono:"Times New Roman",Times,"Noto Serif Thai",serif}
+:root[data-theme="dark"]{--bg:#000;--surface:#000;--ink:#fff;--muted:#fff;--line:#fff;--accent:#fff;--accent-soft:#000;--track:#fff;--field:#000;--fill:#000;--sep:#fff}
+.c-plan,.c-gender,.c-term,.c-age,.c-sa,.c-rider,.slip,.tint,:root[data-theme="dark"] .c-plan,:root[data-theme="dark"] .c-gender,:root[data-theme="dark"] .c-term,:root[data-theme="dark"] .c-age,:root[data-theme="dark"] .c-sa,:root[data-theme="dark"] .c-rider,:root[data-theme="dark"] .tint,:root[data-theme="dark"] .slip{--sc:var(--ink);--sct:var(--ink);--accent:var(--ink);--accent-soft:var(--bg);--line:var(--ink);--track:var(--ink);--field:var(--bg)}
+html,body,:root[data-theme="dark"] body{background:var(--bg)!important;color:var(--ink);font-family:var(--body)}
+*,*::before,*::after{box-shadow:none!important;text-shadow:none!important;border-radius:0!important;background-image:none!important}
+body *{color:var(--ink)!important}
+.panel>.tint,.panel .row2>.tint,:root[data-theme="dark"] .panel>.tint,:root[data-theme="dark"] .panel .row2>.tint,.slip,:root[data-theme="dark"] .slip{background:transparent!important;border:0!important;border-bottom:1px solid var(--ink)!important;padding:8px 0!important}
+.slip,:root[data-theme="dark"] .slip{border:1px solid var(--ink)!important;border-radius:0!important;padding:24px 8px 8px!important}
+.slip::before{left:8px!important}
+.panel::before{font-weight:bold}
+.tint>.label span:first-child,:root[data-theme="dark"] .tint>.label span:first-child{font-weight:bold}
+.brand h1{font-weight:bold}
+.numwrap,.planselect,.riders select,.seg,.seg button,.stp,.chips button,.tiers button,.tiersum li,.riders li,.addbtn,.sh,.themebtn,.tint .numwrap,.tint .planselect,.tint .seg,.tint .stp,.tint .chips button,.tint .tiers button,.tint .riders li,.tint .addbtn,:root[data-theme="dark"] .addbtn,:root[data-theme="dark"] .sh,:root[data-theme="dark"] .themebtn{background:var(--bg)!important;border:1px solid var(--ink)!important;font-weight:normal!important;opacity:1}
+.seg{padding:0!important;gap:0}
+.seg button[aria-pressed="true"],.chips button[aria-pressed="true"],.tiers button.on,.tiersum li.on,:root[data-theme="dark"] .seg button[aria-pressed="true"]{background:var(--ink)!important;color:var(--bg)!important;border-color:var(--ink)!important}
+.seg button[aria-pressed="true"] *,.tiers button.on *,.tiersum li.on *{color:var(--bg)!important}
+.addbtn,.tint .addbtn{background:var(--bg)!important}
+input[type=range]{accent-color:var(--ink)}
+input[type=range]::-webkit-slider-runnable-track{background:var(--ink)!important;height:1px}
+input[type=range]::-moz-range-track{background:var(--ink)!important;height:1px}
+input[type=range]::-webkit-slider-thumb{background:var(--bg)!important;border:1px solid var(--ink)!important}
+input[type=range]::-moz-range-thumb{background:var(--bg)!important;border:1px solid var(--ink)!important}
+.sh-line,.sh-mail,.sh-copy{background:var(--bg)!important;border-color:var(--ink)!important}
+.sh svg{display:none}
+.slip .big,:root[data-theme="dark"] .slip .big{background:transparent!important;border:0!important;border-bottom:1px solid var(--ink)!important}
+.slip .big .v{font-weight:bold}
+.mbar,:root[data-theme="dark"] .mbar{background:var(--bg)!important;border:2px solid var(--ink)!important}
+.mbar *{color:var(--ink)!important}
+.numwrap.bad{border-width:2px!important;border-style:dashed!important}
+a{text-decoration:underline}
+.mbar{text-decoration:none}
 </style>
 </head>
 <body>
