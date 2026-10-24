@@ -265,6 +265,31 @@ input[type=range]::-moz-range-thumb{background:var(--accent);border:3px solid va
 .sh{border:2.5px solid var(--pop-ink);box-shadow:3px 3px 0 var(--pop-ink);font-family:var(--display);font-weight:500}
 .sh-line{background:#06c755}.sh-mail{background:#ff2e88}.sh-copy{background:#2f7bff}
 footer{color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.35)}
+/* Larger text throughout (user asked for bigger type) */
+body{font-size:17.5px}
+.label,.tint>.label span:first-child{font-size:16px}
+.label span:last-child,.plansub,.unisex,.ticks,.daily,.rideradd .sanote,.riders .ri-hint,.riders small,.tiersum-none,.tiersum-save,.discnow,.msg,.notes,.slip .sub{font-size:15px}
+.planselect,.rideradd .planselect,.riders select{font-size:17.5px}
+.seg button{font-size:17.5px}
+.numwrap input{font-size:23px}
+.riders .risa .numwrap input{font-size:19px}
+.numwrap em{font-size:15px}
+.riders b,.riders li b{font-size:17px}
+.riders .rp{font-size:16px}
+.riders .rp.off{font-size:14.5px}
+.tiers button{font-size:14px}.tiers button b{font-size:15px}.tiers button small,.tiersum li b small{font-size:13px}
+.tiersum-h,.big .k{font-size:15px}
+.tiersum li{font-size:15px}
+.slip h2{font-size:22px}
+.big .v{font-size:clamp(36px,7vw,48px)}.big .v small{font-size:17px}
+dt{font-size:15.5px} dd{font-size:16px}
+.compare table{font-size:15.5px}.compare th{font-size:14px}
+.addbtn,.sh{font-size:17px}
+.themebtn{font-size:15.5px}
+footer{font-size:14px}
+.panel>*,.row2>*,.field>*{min-width:0}
+.planselect,.riders select{min-width:0;text-overflow:ellipsis}
+@media (max-width:460px){.tiers{grid-template-columns:minmax(0,1fr)}.tiers button{grid-template-columns:1fr auto;align-items:center;column-gap:10px}.tiers button span{grid-column:1/-1}}
 </style>
 </head>
 <body>
