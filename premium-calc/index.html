@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../20pln/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anuphan:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anuphan:wght@500;600;700&family=Mitr:wght@400;500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
 <style>
 /* Layout: two-pane worksheet — inputs on the left, a "premium slip" on the right; stacks to one column on phones */
 :root{
@@ -162,6 +162,189 @@ dd.neg{color:var(--accent)}
 .riders li .numwrap,.riders li select{background:var(--surface)}
 footer{font-size:12.5px;color:var(--muted);max-width:80ch}
 @media (prefers-reduced-motion:no-preference){.big .v{transition:color .2s}}
+/* Pastel minimal theme: soft tinted cards per field, large touch targets (min 48px) */
+:root{
+  --bg:#faf7ff; --surface:#ffffff; --ink:#2b2433; --muted:#6f6680; --line:#ece6f5;
+  --accent:#e0457b; --accent-soft:#fde8f0; --track:#f6d6e3; --field:#ffffff;
+}
+:root[data-theme="dark"]{--bg:#16131c; --surface:#201c28; --ink:#f1ecf8; --muted:#b3aac2; --line:#342e40; --accent:#ff7aa8; --accent-soft:#3a2230; --track:#4a2c3a; --field:#2a2533}
+body{font-size:16px;background:linear-gradient(160deg,#fdf0f6 0%,#f3f0ff 45%,#ecf8f5 100%) fixed var(--bg)}
+:root[data-theme="dark"] body{background:var(--bg)}
+.brand{border-bottom:0;padding-bottom:0}
+.brand h1{background:linear-gradient(90deg,#e0457b,#8b5cf6 55%,#10a37f);-webkit-background-clip:text;background-clip:text;color:transparent}
+.panel{border:0;border-radius:24px;padding:18px;gap:14px;box-shadow:0 6px 24px -12px rgba(80,50,120,.18)}
+.c-plan{--sc:#e0457b}.c-gender{--sc:#8b5cf6}.c-term{--sc:#0e9f80}.c-age{--sc:#ea7a2a}.c-sa{--sc:#3b82f6}.c-rider{--sc:#16a34a}
+.panel>.tint,.panel .row2>.tint{background:color-mix(in srgb,var(--sc) 11%,var(--surface));border-radius:18px;padding:14px 14px 16px}
+.row2{gap:14px}
+.row2>.tint{flex:1 1 200px}
+.tint{--line:color-mix(in srgb,var(--sc) 22%,var(--surface));--field:var(--surface)}
+.label{font-size:13.5px}
+/* touch targets */
+.planselect,.riders select{min-height:48px;font-size:16px;border-radius:14px;padding:10px 14px;border-color:transparent;box-shadow:0 1px 0 var(--line)}
+.rideradd .planselect{font-size:16px;padding:10px 14px}
+.seg{display:flex;width:100%;border:0;padding:4px;border-radius:16px;background:var(--surface);gap:4px}
+.seg button{flex:1 1 0;min-height:44px;display:flex;align-items:center;justify-content:center;padding:8px 14px;border-radius:12px;font-weight:600;font-size:15.5px}
+.numwrap{min-height:52px;border-radius:14px;border-color:transparent;background:var(--surface);max-width:none}
+.numwrap input{font-size:20px}
+.riders .risa .numwrap{max-width:none}
+.riders .risa .numwrap input{font-size:17px}
+input[type=range]{height:44px;touch-action:pan-y}
+input[type=range]::-webkit-slider-runnable-track{height:10px;border-radius:5px}
+input[type=range]::-moz-range-track{height:10px;border-radius:5px}
+input[type=range]::-webkit-slider-thumb{width:30px;height:30px;margin-top:-10px;border-width:4px;box-shadow:0 2px 6px rgba(0,0,0,.15)}
+input[type=range]::-moz-range-thumb{width:24px;height:24px;border-width:4px}
+.tiers{grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}
+.tiers button{min-height:52px;border-radius:14px;padding:8px 12px;background:var(--surface);border-color:transparent}
+.addbtn{min-height:48px;border-radius:14px;padding:12px 20px;font-size:16px}
+.riders{gap:10px}
+.riders li{border:0;border-radius:18px;padding:12px 12px 12px 16px;background:color-mix(in srgb,var(--accent) 12%,var(--surface))}
+.rm{width:44px;height:44px;border-radius:12px;font-size:22px;background:var(--surface)}
+.themebtn{min-height:44px;padding:8px 16px;border:0;box-shadow:0 2px 10px -4px rgba(80,50,120,.25)}
+.sh{min-height:48px;padding:12px 18px;border-radius:14px;font-size:15px;flex:1 1 140px;justify-content:center}
+.sh-line{background:#4cc58a;color:#fff}.sh-mail{background:#e0457b;color:#fff}.sh-copy{background:#5b9cf0;color:#fff}
+.big .v{color:#e0457b}
+:root[data-theme="dark"] .big .v{color:#ff7aa8}
+.slip dl>*{padding:10px 0}
+.tiersum li{border-color:transparent;background:color-mix(in srgb,var(--accent) 6%,var(--surface));border-radius:12px;padding:8px 12px}
+.msg{border-radius:14px}
+.tiersum li b small,.tiers button small{display:block;font-weight:400;font-size:11.5px;color:var(--muted)}
+.c-plan{--sc:#1e88e5}.c-sa{--sc:#0891b2}
+.c-plan .planselect{border:2px solid var(--accent);color:var(--accent);background:var(--surface)}
+.c-plan .planselect:hover{background:color-mix(in srgb,var(--accent) 6%,var(--surface))}
+/* Vivid pop theme: bold gradient backdrop, sticker-style cards with dark outlines and offset shadows */
+:root{
+  --pop-ink:#1b1035; --bg:#fff4fb; --surface:#ffffff; --ink:#1b1035; --muted:#5b4f78; --line:#1b1035;
+  --accent:#ff2e88; --accent-soft:#ffe0ef; --track:#ffd0e6; --field:#ffffff;
+  --display:"Mitr","Anuphan",system-ui,sans-serif;
+}
+:root[data-theme="dark"]{--pop-ink:#000; --bg:#120a24; --surface:#1f1538; --ink:#f6f0ff; --muted:#c3b5e6; --line:#000; --accent:#ff5ca8; --accent-soft:#3a1736; --track:#4a2346; --field:#2a1f48}
+body{background:
+  radial-gradient(circle at 12% 8%,rgba(255,255,255,.35) 0 2px,transparent 3px) 0 0/22px 22px,
+  linear-gradient(135deg,#ff3d7f 0%,#a43bff 45%,#2f7bff 75%,#00d1c1 100%);min-height:100vh}
+:root[data-theme="dark"] body{background:
+  radial-gradient(circle at 12% 8%,rgba(255,255,255,.08) 0 2px,transparent 3px) 0 0/22px 22px,
+  radial-gradient(60% 50% at 0% 0%,#5a1a6e 0,transparent 70%),radial-gradient(60% 50% at 100% 100%,#0b3a6e 0,transparent 70%),#120a24}
+.brand h1{font-family:var(--display);font-weight:700;font-size:clamp(30px,6vw,44px);color:#fff;background:none;-webkit-background-clip:border-box;background-clip:border-box;text-shadow:3px 3px 0 var(--pop-ink);letter-spacing:.01em}
+.themebtn{border:2.5px solid var(--pop-ink);box-shadow:3px 3px 0 var(--pop-ink);background:#fff;color:#1b1035;font-weight:600}
+:root[data-theme="dark"] .themebtn{background:#1f1538;color:#f6f0ff;border-color:#000}
+.panel{border:3px solid var(--pop-ink);border-radius:28px;box-shadow:7px 7px 0 var(--pop-ink);padding:16px;gap:14px}
+.c-plan{--sc:#2f7bff}.c-gender{--sc:#a43bff}.c-term{--sc:#00b37e}.c-age{--sc:#ff7a00}.c-sa{--sc:#ff2e88}.c-rider{--sc:#00a6c7}
+.panel>.tint,.panel .row2>.tint{background:color-mix(in srgb,var(--sc) 16%,var(--surface));border:2.5px solid var(--pop-ink);border-radius:22px;padding:14px 14px 16px}
+:root[data-theme="dark"] .panel>.tint,:root[data-theme="dark"] .panel .row2>.tint{background:color-mix(in srgb,var(--sc) 22%,var(--surface))}
+.tint>.label span:first-child{background:var(--accent);color:#fff;padding:3px 12px 3px 10px;border-radius:999px;font-family:var(--display);font-weight:600;font-size:14px;letter-spacing:0;box-shadow:2px 2px 0 var(--pop-ink)}
+.tint>.label span:first-child::before{background:#fff}
+:root[data-theme="dark"] .tint>.label span:first-child{color:#140b25}
+:root[data-theme="dark"] .tint>.label span:first-child::before{background:#140b25}
+.planselect,.riders select,.c-plan .planselect{border:2.5px solid var(--pop-ink);box-shadow:3px 3px 0 var(--pop-ink);background:var(--surface);color:var(--ink);font-family:var(--display);font-weight:500}
+.c-plan .planselect{color:var(--accent)}
+.numwrap{border:2.5px solid var(--pop-ink);box-shadow:3px 3px 0 var(--pop-ink);background:var(--surface)}
+.seg{border:2.5px solid var(--pop-ink);background:var(--surface);box-shadow:3px 3px 0 var(--pop-ink)}
+.seg button{font-family:var(--display);font-weight:500;color:var(--ink)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:#fff;box-shadow:inset 0 -3px 0 rgba(0,0,0,.18)}
+:root[data-theme="dark"] .seg button[aria-pressed="true"]{color:#140b25}
+input[type=range]::-webkit-slider-runnable-track{border:2px solid var(--pop-ink);height:12px;border-radius:6px}
+input[type=range]::-moz-range-track{border:2px solid var(--pop-ink);height:12px;border-radius:6px}
+input[type=range]::-webkit-slider-thumb{background:var(--accent);border:3px solid var(--pop-ink);margin-top:-11px;box-shadow:2px 2px 0 var(--pop-ink)}
+input[type=range]::-moz-range-thumb{background:var(--accent);border:3px solid var(--pop-ink)}
+.tiers button{border:2px solid var(--pop-ink);background:var(--surface)}
+.tiers button.on{background:var(--accent);box-shadow:3px 3px 0 var(--pop-ink)}
+.tiers button.on,.tiers button.on b,.tiers button.on small,.tiers button.on span{color:#fff}
+:root[data-theme="dark"] .tiers button.on,:root[data-theme="dark"] .tiers button.on b,:root[data-theme="dark"] .tiers button.on small,:root[data-theme="dark"] .tiers button.on span{color:#140b25}
+.addbtn{border:2.5px solid var(--pop-ink);box-shadow:3px 3px 0 var(--pop-ink);font-family:var(--display);font-weight:600}
+.addbtn:active,.sh:active,.seg button:active,.themebtn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--pop-ink)}
+.riders li{border:2.5px solid var(--pop-ink);background:color-mix(in srgb,var(--accent) 18%,var(--surface));box-shadow:3px 3px 0 var(--pop-ink)}
+.riders li b{font-family:var(--display);font-weight:600}
+.rm{border:2px solid var(--pop-ink);background:var(--surface);color:var(--ink)}
+.slip h2{font-family:var(--display);font-weight:600;font-size:19px}
+.slip .big{background:linear-gradient(120deg,#ff2e88,#a43bff);border:2.5px solid var(--pop-ink);border-radius:20px;padding:12px 16px;box-shadow:3px 3px 0 var(--pop-ink)}
+.slip .big .k,.slip .big .v,.slip .big .v small,.slip .big .daily{color:#fff}
+:root[data-theme="dark"] .big .v{color:#fff}
+.tiersum li{border:2px solid var(--pop-ink);background:var(--surface)}
+.tiersum li.on{background:var(--accent);color:#fff}
+.tiersum li.on b,.tiersum li.on small,.tiersum li.on span{color:#fff}
+.sh{border:2.5px solid var(--pop-ink);box-shadow:3px 3px 0 var(--pop-ink);font-family:var(--display);font-weight:500}
+.sh-line{background:#06c755}.sh-mail{background:#ff2e88}.sh-copy{background:#2f7bff}
+footer{color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.35)}
+/* Larger text throughout (user asked for bigger type) */
+body{font-size:17.5px}
+.label,.tint>.label span:first-child{font-size:16px}
+.label span:last-child,.plansub,.unisex,.ticks,.daily,.rideradd .sanote,.riders .ri-hint,.riders small,.tiersum-none,.tiersum-save,.discnow,.msg,.notes,.slip .sub{font-size:15px}
+.planselect,.rideradd .planselect,.riders select{font-size:17.5px}
+.seg button{font-size:17.5px}
+.numwrap input{font-size:23px}
+.riders .risa .numwrap input{font-size:19px}
+.numwrap em{font-size:15px}
+.riders b,.riders li b{font-size:17px}
+.riders .rp{font-size:16px}
+.riders .rp.off{font-size:14.5px}
+.tiers button{font-size:14px}.tiers button b{font-size:15px}.tiers button small,.tiersum li b small{font-size:13px}
+.tiersum-h,.big .k{font-size:15px}
+.tiersum li{font-size:15px}
+.slip h2{font-size:22px}
+.big .v{font-size:clamp(36px,7vw,48px)}.big .v small{font-size:17px}
+dt{font-size:15.5px} dd{font-size:16px}
+.compare table{font-size:15.5px}.compare th{font-size:14px}
+.addbtn,.sh{font-size:17px}
+.themebtn{font-size:15.5px}
+footer{font-size:14px}
+.panel>*,.row2>*,.field>*{min-width:0}
+.planselect,.riders select{min-width:0;text-overflow:ellipsis}
+@media (max-width:460px){.tiers{grid-template-columns:minmax(0,1fr)}.tiers button{grid-template-columns:1fr auto;align-items:center;column-gap:10px}.tiers button span{grid-column:1/-1}}
+/* iOS look: grouped background, inset rounded cards, SF type, segmented controls, system colours */
+:root{
+  --pop-ink:transparent; --bg:#f2f2f7; --surface:#ffffff; --ink:#000000; --muted:#6c6c70; --line:#e5e5ea;
+  --mono:-apple-system,BlinkMacSystemFont,"SF Pro Text","IBM Plex Sans Thai",system-ui,sans-serif; --accent:#007aff; --accent-soft:#e6f0ff; --track:#e3e3e8; --field:#ffffff; --fill:rgba(118,118,128,.12); --sep:rgba(60,60,67,.18);
+  --display:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue","IBM Plex Sans Thai",system-ui,sans-serif;
+  --body:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue","IBM Plex Sans Thai",system-ui,sans-serif;
+}
+:root[data-theme="dark"]{--pop-ink:transparent; --bg:#000000; --surface:#1c1c1e; --ink:#ffffff; --muted:#98989f; --line:#38383a; --accent:#0a84ff; --accent-soft:#0d2a4d; --track:#3a3a3c; --field:#2c2c2e; --fill:rgba(118,118,128,.24); --sep:rgba(84,84,88,.6)}
+body,:root[data-theme="dark"] body{font-family:var(--body);background:var(--bg);min-height:100vh;-webkit-font-smoothing:antialiased}
+.brand h1{font-family:var(--display);font-weight:700;color:var(--ink);text-shadow:none;letter-spacing:-.02em;font-size:clamp(32px,6vw,40px)}
+.themebtn,:root[data-theme="dark"] .themebtn{border:0;box-shadow:none;border-radius:999px;background:var(--fill);color:var(--accent)}
+/* grouped sections */
+.panel{position:relative;border:0;border-radius:0;background:transparent;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;padding:34px 0 8px;gap:14px}
+.panel::before{content:attr(data-title);position:absolute;top:6px;left:16px;font-size:14px;font-weight:400;color:var(--muted);text-transform:uppercase;letter-spacing:.02em;font-family:var(--body)}
+.panel::after{content:none}
+.c-plan{--sc:#007aff}.c-gender{--sc:#af52de}.c-term{--sc:#34c759;--sct:#248a3d}.c-age{--sc:#ff9500;--sct:#c93400}.c-sa{--sc:#ff2d55}.c-rider{--sc:#30b0c7;--sct:#0071a4}
+:root[data-theme="dark"] .c-plan{--sc:#0a84ff}:root[data-theme="dark"] .c-gender{--sc:#bf5af2}:root[data-theme="dark"] .c-term{--sc:#30d158;--sct:#30d158}:root[data-theme="dark"] .c-age{--sc:#ff9f0a;--sct:#ff9f0a}:root[data-theme="dark"] .c-sa{--sc:#ff375f}:root[data-theme="dark"] .c-rider{--sc:#40c8e0;--sct:#40c8e0}
+.tint,:root[data-theme="dark"] .tint{--accent:var(--sc);--accent-soft:color-mix(in srgb,var(--sc) 14%,var(--surface));--accent-ink:#fff}
+.panel>.tint,.panel .row2>.tint,:root[data-theme="dark"] .panel>.tint,:root[data-theme="dark"] .panel .row2>.tint{background:var(--surface);border:0;border-radius:14px;padding:14px 16px 16px;box-shadow:none}
+.tint>.label span:first-child,:root[data-theme="dark"] .tint>.label span:first-child{background:none;color:var(--ink);padding:0;border-radius:0;box-shadow:none;font-family:var(--body);font-weight:600}
+.tint>.label span:first-child::before,:root[data-theme="dark"] .tint>.label span:first-child::before{width:24px;height:24px;border-radius:7px;background:var(--sc)}
+/* controls */
+.planselect,.riders select,.c-plan .planselect,.numwrap,:root[data-theme="dark"] .planselect,:root[data-theme="dark"] .riders select,:root[data-theme="dark"] .numwrap{border:0;border-radius:10px;box-shadow:none;background:var(--fill);color:var(--ink);font-family:var(--body);font-weight:400}
+.c-plan .planselect{font-weight:600;color:var(--sct,var(--sc))}
+.planselect:focus-visible,.numwrap:focus-within{outline:2px solid var(--accent);outline-offset:1px}
+.seg,:root[data-theme="dark"] .seg{border:0;border-radius:10px;background:var(--fill);box-shadow:none;padding:2px}
+.seg button{font-family:var(--body);font-weight:500;border-radius:8px;box-shadow:none;color:var(--ink);background:transparent}
+.seg button[aria-pressed="true"]{background:#fff;color:var(--sct,var(--sc));font-weight:600;box-shadow:0 3px 8px rgba(0,0,0,.12),0 3px 1px rgba(0,0,0,.04)}
+:root[data-theme="dark"] .seg button[aria-pressed="true"]{background:#636366;color:#fff}
+input[type=range]::-webkit-slider-runnable-track{border:0;height:4px;border-radius:2px}
+input[type=range]::-moz-range-track{border:0;height:4px;border-radius:2px}
+input[type=range]::-webkit-slider-thumb,:root[data-theme="dark"] input[type=range]::-webkit-slider-thumb{width:28px;height:28px;margin-top:-12px;background:#fff;border:0;box-shadow:0 0 0 .5px rgba(0,0,0,.04),0 3px 8px rgba(0,0,0,.15),0 3px 1px rgba(0,0,0,.06)}
+input[type=range]::-moz-range-thumb{width:28px;height:28px;background:#fff;border:0;box-shadow:0 3px 8px rgba(0,0,0,.15)}
+.tiers button,.tiersum li{border:0;border-radius:10px;background:var(--fill);box-shadow:none}
+.tiers button.on,.tiersum li.on{background:var(--accent-soft);border:0;box-shadow:inset 0 0 0 2px var(--accent)}
+.tiers button.on,.tiers button.on b,.tiers button.on span,.tiersum li.on,.tiersum li.on span,:root[data-theme="dark"] .tiers button.on,:root[data-theme="dark"] .tiers button.on span{color:var(--ink)}
+.tiers button.on b,.tiersum li.on b,:root[data-theme="dark"] .tiers button.on b{color:var(--sct,var(--accent))}
+.tiers button.on small,.tiersum li.on b small,:root[data-theme="dark"] .tiers button.on small{color:var(--muted)}
+.addbtn{border:0;border-radius:12px;box-shadow:none;font-family:var(--body);font-weight:600;background:var(--sc,var(--accent));color:#fff}
+.addbtn:active,.sh:active,.seg button:active,.themebtn:active{transform:none;box-shadow:none;opacity:.6;filter:none}
+.riders li{border:0;border-radius:12px;background:var(--fill);box-shadow:none}
+.riders li b{font-family:var(--body);font-weight:600;color:var(--ink)}
+.rm{border:0;border-radius:999px;background:transparent;color:#ff3b30}
+.rm:hover{background:rgba(255,59,48,.12);color:#ff3b30}
+/* summary card */
+.slip{background:var(--surface)!important;border-radius:16px!important;padding:40px 16px 16px!important}
+.slip::before{top:12px}
+.slip .big,:root[data-theme="dark"] .slip .big{background:linear-gradient(135deg,#0a84ff,#5e5ce6);border:0;border-radius:14px;box-shadow:none;padding:16px 18px}
+.slip .big .k,.slip .big .v,.slip .big .v small,.slip .big .daily{color:#fff}
+.slip h2{font-family:var(--display);font-weight:700}
+.sh{border:0;border-radius:12px;box-shadow:none;font-family:var(--body);font-weight:600;color:#fff}
+.sh-line{background:#06c755}.sh-mail{background:#007aff}.sh-copy{background:#5856d6}
+footer{color:var(--muted);text-shadow:none}
+.panel *{font-variant-numeric:tabular-nums}
+.risa,.risa>*,.risa .numwrap input{min-width:0;max-width:100%}.risa .numwrap input{width:100%}
 </style>
 </head>
 <body>
@@ -172,7 +355,7 @@ footer{font-size:12.5px;color:var(--muted);max-width:80ch}
   </header>
 
   <div class="grid">
-    <section class="panel" aria-label="ข้อมูลผู้เอาประกัน">
+    <section class="panel" aria-label="ข้อมูลผู้เอาประกัน" data-title="ข้อมูลผู้เอาประกัน">
       <div class="tint c-plan">
         <p class="label"><span>แบบประกัน</span></p>
         <select id="plans" class="planselect" aria-label="เลือกแบบประกัน"></select>
@@ -224,7 +407,7 @@ footer{font-size:12.5px;color:var(--muted);max-width:80ch}
       <div class="msg" id="msg" hidden></div>
     </section>
 
-    <aside class="panel slip" aria-live="polite">
+    <aside class="panel slip" aria-live="polite" data-title="สรุปเบี้ยประกัน">
       <div>
         <h2 id="sName"></h2>
         <div class="sub" id="sSub"></div>
@@ -317,11 +500,11 @@ const PLANS = [
   ages:[0,75], terms:[20], saMin:100000, saMax:null, sliderMax:20000000, rows:R.exc, unisex:true,
   col:()=>0, disc:sa=> sa>=250000?1:0, tiers:[[250000,1]],
   discNote:'ส่วนลด 1 บาท/1,000 เมื่อทุนตั้งแต่ 250,000', chips:[100000,250000,1000000,5000000]},
- {id:'asure', name:'Annuity Sure', thn:'บำนาญ ได้ชัวร์ (บำนาญแบบลดหย่อนภาษีได้)', th:'บำนาญ ชำระเบี้ย 9 ปี หรือถึงอายุ 60 รับบำนาญปีละ 15% ของทุน อายุ 60–90 ปี', cover:'คุ้มครองถึงอายุ 90 ปี',
+ {id:'asure', riders:['ai','add','adb'], name:'Annuity Sure', thn:'บำนาญ ได้ชัวร์ (บำนาญแบบลดหย่อนภาษีได้)', th:'บำนาญ ชำระเบี้ย 9 ปี หรือถึงอายุ 60 รับบำนาญปีละ 15% ของทุน อายุ 60–90 ปี', cover:'คุ้มครองถึงอายุ 90 ปี',
   get ages(){ return S.term===9 ? [20,50] : [20,55]; }, terms:[9,'to60'], saMin:100000, saMax:null, sliderMax:10000000, rows:R.asure,
   col:(t,s)=>(t===9?0:2)+(s==='m'?0:1), disc:()=>0, chips:[100000,500000,1000000,3000000],
   extra:(r,g,sa)=>[['เงินบำนาญต่อปี (15% · อายุ 60–90 ปี)',money(sa*0.15)+' บาท']]},
- {id:'afix', name:'Annuity Fix', thn:'บำนาญ มั่นคง (บำนาญแบบลดหย่อนภาษีได้)', th:'บำนาญ ชำระเบี้ยถึงอายุ 60 ทุน = มูลค่าบำนาญตั้งต้น', cover:'รับบำนาญอายุ 60–85 ปี',
+ {id:'afix', riders:['ai','add','adb'], name:'Annuity Fix', thn:'บำนาญ มั่นคง (บำนาญแบบลดหย่อนภาษีได้)', th:'บำนาญ ชำระเบี้ยถึงอายุ 60 ทุน = มูลค่าบำนาญตั้งต้น', cover:'รับบำนาญอายุ 60–85 ปี',
   ages:[20,55], terms:['to60'], saMin:200000, saMax:null, sliderMax:10000000, rows:R.afix,
   col:(t,s)=>s==='m'?0:1, disc:()=>0, chips:[200000,500000,1000000,2000000],
   extra:(r,g,sa)=>[[`เงินบำนาญต่อปี (${g==='m'?'6.25':'5.95'}% · อายุ 60–85 ปี)`,money(Math.round(sa*(g==='m'?0.0625:0.0595)*100)/100)+' บาท']]},
@@ -354,6 +537,15 @@ const RIDERS=[
    begin:{bands:[[0,5],[6,10],[11,15],[16,20],[21,25],[26,30],[31,35],[36,40],[41,45],[46,50],[51,55],[56,60],[61,65],[66,70],[71,75]], m:[[32700,46200,55600,70500,86700],[17200,25100,28900,36400,43700],[8500,12900,15300,19300,23000],[3700,6300,7600,9800,11600],[3800,6400,7800,9900,11700],[4100,7000,8600,11100,13100],[4300,7300,9000,11700,13700],[4500,7700,9400,12100,14300],[4900,8200,10100,13000,15300],[5100,8600,10500,13500,15900],[7100,11900,14500,18700,22000],[9500,15600,19000,24400,28900],[13700,20900,25600,33000,39000],[19800,28700,35000,45300,55700],[29700,41100,50200,65200,77300]], f:[[32600,45900,53600,68000,83700],[16200,23700,27400,34300,41300],[7700,11900,14000,17600,21500],[3900,7100,8100,11000,13400],[4200,7700,9000,11900,14500],[4300,8200,9400,12400,15000],[4800,8300,10100,13400,15700],[5100,8600,10500,13700,16200],[5500,9200,11400,15000,17600],[5700,10000,12300,16200,19700],[7700,13000,16000,20700,24500],[10400,16700,20500,26700,31600],[15000,22500,27700,36200,42900],[21600,30900,38000,50000,59300],[32400,44600,54700,72200,85700]]},
    bal:{bands:[[11,15],[16,20],[21,25],[26,30],[31,35],[36,40],[41,45],[46,50],[51,55],[56,60],[61,65],[66,70],[71,75]], m:[[9400,14300,17000,21400,25500],[4100,7000,8400,10800,12800],[4200,7100,8600,11000,13000],[4500,7700,9500,12300,14500],[4700,8100,10000,12900,15200],[5000,8500,10400,13400,15800],[5400,9100,11200,14400,17000],[5600,9500,11600,14900,17600],[7800,13200,16100,20700,24400],[10500,17300,21100,27100,32100],[15200,23200,28400,36600,43300],[22000,31800,38800,50300,61800],[33000,45600,55700,72400,85800]], f:[[8500,13200,15500,19500,23800],[4300,7800,9000,12200,14800],[4600,8500,10000,13200,16100],[4700,9100,10400,13700,16600],[5300,9200,11200,14800,17400],[5600,9500,11600,15200,18000],[6100,10200,12600,16600,19500],[6200,11100,13600,18000,21800],[8500,14400,17700,23000,27200],[11500,18500,22700,29600,35100],[16600,25000,30700,40200,47600],[24000,34300,42200,55500,65800],[36000,49500,60700,80200,95200]]}},
   premium(g,age,n){const pl=this.plans[n-1],tb=this.tables[pl.t];const i=tb.bands.findIndex(([a,b])=>age>=a&&age<=b);return i<0?null:tb[g][i][pl.c];}},
+ {id:'ic', color:'#1d4ed8', name:'Infinite Care', th:'ค่ารักษาพยาบาล วงเงิน 120 ล้าน/ปี', ages:[18,75],
+  plans:[{n:1,t:'d0',c:0,label:'ทั่วโลก · ไม่มีความรับผิดส่วนแรก',short:'ทั่วโลก · ไม่มีความรับผิดส่วนแรก'},{n:2,t:'d0',c:2,label:'ทั่วโลก ยกเว้นสหรัฐฯ · ไม่มีความรับผิดส่วนแรก',short:'ทั่วโลก ยกเว้นสหรัฐฯ · ไม่มีความรับผิดส่วนแรก'},{n:3,t:'d100',c:0,label:'ทั่วโลก · ความรับผิดส่วนแรก 100,000',short:'ทั่วโลก · ความรับผิดส่วนแรก 100,000'},{n:4,t:'d100',c:2,label:'ทั่วโลก ยกเว้นสหรัฐฯ · ความรับผิดส่วนแรก 100,000',short:'ทั่วโลก ยกเว้นสหรัฐฯ · ความรับผิดส่วนแรก 100,000'},{n:5,t:'d300',c:0,label:'ทั่วโลก · ความรับผิดส่วนแรก 300,000',short:'ทั่วโลก · ความรับผิดส่วนแรก 300,000'},{n:6,t:'d300',c:2,label:'ทั่วโลก ยกเว้นสหรัฐฯ · ความรับผิดส่วนแรก 300,000',short:'ทั่วโลก ยกเว้นสหรัฐฯ · ความรับผิดส่วนแรก 300,000'}],
+  /* tables[deductible][age-18] = [m world, f world, m ex-US, f ex-US] */
+  tables:{"d0":[[143280,171840,79980,95880],[144180,177540,82500,101520],[147540,181140,84240,103380],[149940,183540,85320,104460],[152460,185220,86580,105120],[154440,187560,87540,106260],[159120,193380,90000,109320],[165240,198660,93300,112140],[170040,205200,95820,115620],[172680,208680,97320,117600],[175740,211680,99000,119220],[178560,213960,100620,120540],[180660,215220,101940,121380],[182220,215880,102900,121860],[184140,217860,103860,122880],[185820,220020,104700,123960],[187920,222300,105840,125220],[189960,224040,106920,126060],[192120,226020,108180,127200],[194220,227940,109260,128220],[196140,230940,109800,129240],[198720,233760,110760,130260],[201000,236520,111540,131220],[204000,238620,112680,131760],[207360,242100,114000,133080],[210120,245280,115020,134220],[214260,249240,116760,135780],[219060,252840,118860,137160],[227940,260160,123180,140580],[233160,268260,125520,144360],[240720,276420,129060,148200],[246060,286380,131460,152940],[252120,296580,134220,157800],[267480,305160,141900,161820],[275580,312180,145620,164940],[285000,319380,150360,168480],[299640,328500,157740,172920],[319380,337740,167820,177420],[324720,347100,170280,182040],[338880,361980,177240,189300],[362760,387420,189360,202260],[390000,421020,203760,219900],[420720,449040,219960,234780],[448800,463920,234900,242820],[473220,478620,247980,250800],[504540,493080,264660,258660],[537600,519240,285300,275580],[573420,553860,304320,293940],[590520,583560,313380,309720],[629340,621960,334020,330060],[670500,654720,355800,347460],[714180,697380,379020,370080],[771360,762600,409320,404700],[840900,831660,446220,441300],[895980,886260,475440,470280],[944160,933900,501000,495540],[1016460,994860,539340,527880],[1082040,1059300,574140,562020]],"d100":[[100320,120300,55980,67140],[100920,124260,57780,71040],[103260,126780,58980,72360],[104940,128460,59700,73140],[106740,129660,60600,73560],[108120,131280,61260,74400],[111360,135360,63000,76500],[115680,139080,65340,78480],[119040,143640,67080,80940],[120900,146100,68100,82320],[123000,148200,69300,83460],[124980,149760,70440,84360],[126480,150660,71340,84960],[127560,151140,72060,85320],[128880,152520,72720,86040],[130080,154020,73320,86760],[131520,155640,74100,87660],[132960,156840,74820,88260],[134460,158220,75720,89040],[135960,159540,76500,89760],[137280,161640,76860,90480],[139080,163620,77520,91200],[140700,165540,78060,91860],[142800,167040,78900,92220],[145140,169500,79800,93180],[147060,171720,80520,93960],[150000,174480,81720,95040],[153360,177000,83220,96000],[159540,182100,86220,98400],[163200,187800,87840,101040],[168480,193500,90360,103740],[172260,200460,92040,107040],[176460,207600,93960,110460],[187260,213600,99360,113280],[192900,218520,101940,115440],[199500,223560,105240,117960],[209760,229980,110400,121020],[223560,237720,117480,124200],[227280,247080,119220,127440],[238860,261960,124080,132540],[262740,287400,132540,141600],[289980,321000,142620,153960],[320700,349020,153960,164340],[348780,363900,164460,169980],[373200,378600,173580,175560],[404520,393060,185280,181080],[437580,419220,199740,192900],[473400,453840,213000,205740],[490500,483540,219360,216780],[529320,521940,234000,231060],[570480,554700,255780,247440],[614160,597360,279000,270060],[671340,662580,309300,304680],[740880,731640,346200,341280],[795960,786240,375420,370260],[844140,833880,400980,395520],[916440,894840,439320,427860],[982020,959280,474120,462000]],"d300":[[71640,85920,39990,47940],[72090,88770,41250,50760],[73770,90570,42120,51690],[74970,91770,42660,52230],[76230,92610,43290,52560],[77220,93780,43770,53130],[79560,96690,45000,54660],[82620,99330,46650,56070],[85020,102600,47910,57810],[86340,104340,48660,58800],[87870,105840,49500,59610],[89280,106980,50310,60270],[90330,107610,50970,60690],[91110,107940,51450,60930],[92070,108930,51930,61440],[92910,110010,52350,61980],[93960,111150,52920,62610],[94980,112020,53460,63030],[96060,113010,54090,63600],[97110,113970,54630,64110],[98070,115470,54900,64620],[99360,116880,55380,65130],[100500,118260,55770,65610],[102000,119310,56340,65880],[103680,121050,57000,66540],[105060,122640,57510,67110],[107130,124620,58380,67890],[109530,126420,59430,68580],[113970,130080,61590,70290],[116580,134130,62760,72180],[120360,138210,64530,74100],[123030,143190,65730,76470],[126060,148290,67110,78900],[133740,152580,70950,80910],[137790,156090,72810,82470],[142500,159690,75180,84240],[149820,164250,78870,86460],[159690,168870,83910,88710],[162360,173550,85140,91020],[169440,180990,88620,94650],[181380,193710,94680,101130],[195000,210510,101880,109950],[210360,224520,109980,117390],[224400,231960,117450,121410],[236610,239310,123990,125400],[252270,246540,132330,129330],[268800,259620,142650,137790],[286710,276930,152160,146970],[295260,291780,156690,154860],[329340,321960,167010,165030],[370500,354720,177900,173730],[414180,397380,189510,185040],[471360,462600,204660,202350],[540900,531660,223110,220650],[595980,586260,237720,235140],[644160,633900,250500,247770],[716460,694860,269670,263940],[782040,759300,287070,281010]]},
+  premium(g,age,n){const pl=this.plans[n-1],row=this.tables[pl.t][age-18]; return row?row[pl.c+(g==='m'?0:1)]:null;}},
+ {id:'hbx', color:'#a21caf', name:'HB Extra', th:'ค่าชดเชยรายวันเมื่อนอนโรงพยาบาล', ages:[0,70], saCfg:{min:100,max:10000,step:100,def:1000}, saText:sa=>`ชดเชย ${fmt0(sa)} บาท/วัน`,
+  bands:[[0,20],[21,35],[36,40],[41,45],[46,50],[51,55],[56,60],[61,65],[66,70]],
+  rates:{m:[360,210,230,250,290,350,420,510,710], f:[325,280,290,320,370,400,460,490,600]},
+  premium(g,age,_,sa){const i=this.bands.findIndex(([a,b])=>age>=a&&age<=b); return i<0?null:Math.round(this.rates[g][i]*sa/100*100)/100;}},
  {id:'ci', color:'#b45309', name:'CI Plus', th:'คุ้มครองโรคร้ายแรง 44 โรค/การรักษา', ages:[0,75], saCfg:{min:100000,max:25000000,step:100000,def:100000},
   bands:[[0,15],[16,20],[21,25],[26,30],[31,35],[36,40],[41,45],[46,50],[51,55],[56,60],[61,65],[66,70],[71,75]],
   rates:{m:[2.62,2.76,2.89,3.16,3.84,5.23,10.19,15.92,25.38,42.31,61.04,81.76,112.64], f:[2.27,2.06,2.15,2.55,3.53,4.6,6.38,10.17,15.92,26.09,35.81,51.71,73.52]},
@@ -403,7 +595,7 @@ const RIDERS=[
 ];
 /* dropdown groups: [heading, ids] in display order */
 const PLAN_GROUPS=[['ประกันตลอดชีพ',['p20','p1015','plus','senior','p65']],['ประกันสะสมทรัพย์',['ss','lti','p5','end','exc']],['ประกันบำนาญ',['asure','afix']],['ประกันเพื่อส่งต่อมรดก (Legacy)',['legacy','lplus','lprot']]];
-const RIDER_GROUPS=[['ค่ารักษาพยาบาล',['hh','hs','st','hk']],['โรคร้ายแรง',['ci','mpci','cc','hero']],['อุบัติเหตุ',['ai','add','adb']],['ทุพพลภาพ / ยกเว้นเบี้ย',['tpd','wpci']]];
+const RIDER_GROUPS=[['ค่ารักษาพยาบาล',['hh','hs','st','hk','ic']],['ค่าชดเชยรายวัน',['hbx']],['โรคร้ายแรง',['ci','mpci','cc','hero']],['อุบัติเหตุ',['ai','add','adb']],['ทุพพลภาพ / ยกเว้นเบี้ย',['tpd','wpci']]];
 const groupHTML=(groups,items,opt)=>groups.map(([h,ids])=>{ const xs=ids.map(id=>items.find(x=>x.id===id)).filter(Boolean); return xs.length?`<optgroup label="${h}">${xs.map(opt).join('')}</optgroup>`:''; }).join('');
 const riderDef = id => RIDERS.find(x=>x.id===id);
 const planAges = (d,n) => (n && d.plans && d.plans[n-1] && d.plans[n-1].ages) || d.ages;
@@ -411,13 +603,17 @@ const rangeText = ([a,b],d) => `${a===0?(d&&d.ageLo||'15 วัน'):a}–${b} �
 const saOk = (d,sa) => !d.saCfg || (d.saCfg.snap ? d.saCfg.snap.includes(sa) : isFinite(sa) && sa>=d.saCfg.min && sa<=d.saCfg.max);
 const saRangeText = c => c.snap ? `ทุนเลือกได้ ${c.snap.map(v=>fmt0(v/1e6)).join(' / ')} ล้านบาท` : `ทุน ${fmt0(c.min)} – ${fmt0(c.max)} บาท${c.maxNote||''}`;
 const snapSa = (c,sa) => !c.snap||!isFinite(sa) ? sa : c.snap.reduce((a,b)=>Math.abs(b-sa)<Math.abs(a-sa)?b:a);
-const riderPrem = rd => { const d=riderDef(rd.id), [a,b]=planAges(d,rd.plan); return (S.age>=a&&S.age<=b&&saOk(d,rd.sa)) ? d.premium(S.g,S.age,rd.plan,rd.sa) : null; };
+/* annuity brochures allow accident riders only */
+const riderAllowed = id => !S.plan.riders || S.plan.riders.includes(id);
+const riderPrem = rd => { const d=riderDef(rd.id), [a,b]=planAges(d,rd.plan); return (riderAllowed(rd.id)&&S.age>=a&&S.age<=b&&saOk(d,rd.sa)) ? d.premium(S.g,S.age,rd.plan,rd.sa) : null; };
 const riderSaToPos = (c,sa) => c.snap ? Math.max(0,c.snap.indexOf(snapSa(c,sa))) : Math.round(Math.sqrt(Math.max(0,Math.min(1,(sa-c.min)/(c.max-c.min))))*1000);
 const riderPosToSa = (c,pos) => c.snap ? c.snap[pos] : Math.round((c.min+(c.max-c.min)*(pos/1000)**2)/c.step)*c.step;
 const planText = (d,n) => { const pl=d.plans[n-1]; return pl.detail ? `${pl.label} · ${pl.detail}` : `${pl.label} · ค่าห้อง ${pl.room} บาท/วัน`; };
 const planShort = (d,n) => d.plans[n-1].label;
-const riderLabel = (d,rd) => d.auto ? (m=>m?`ทุน ${fmt0(m.sa)} บาท (= เบี้ยแบบหลัก)`:'')(d.main()) : d.saCfg ? `ทุน ${fmt0(rd.sa)} บาท${d.plans?' '+(d.plans[rd.plan-1].short||d.plans[rd.plan-1].label):''}` : planShort(d,rd.plan);
-const S = {plan:PLANS[0], g:'f', term:20, age:30, sa:PLANS[0].saMin, riders:[]};
+const riderLabel = (d,rd) => d.auto ? (m=>m?`ทุน ${fmt0(m.sa)} บาท (= เบี้ยแบบหลัก)`:'')(d.main()) : d.saCfg ? `${d.saText?d.saText(rd.sa):`ทุน ${fmt0(rd.sa)} บาท`}${d.plans?' '+(d.plans[rd.plan-1].short||d.plans[rd.plan-1].label):''}` : planShort(d,rd.plan);
+const S = {plan:PLANS[0], g:'f', term:20, age:30, sa:Math.max(150000,PLANS[0].saMin), riders:[]};
+/* rider picker opens on Health Starter 1500 Balanced; nothing is added until the user taps + เพิ่ม */
+let pickDefault = {id:'ci', plan:null};
 const $ = id => document.getElementById(id);
 const saMinOf = (p,t) => typeof p.saMin==='function' ? p.saMin(t) : p.saMin;
 const saTopOf = p => p.saMax ?? p.sliderMax;
@@ -466,20 +662,30 @@ function tiersOf(p){
 const tierAmt = n => n>=1e6 ? fmt0(n/1e6)+' ล้าน' : fmt0(n);
 const tierRange = x => 'ทุน '+(x.to ? (x.to>=1e6 ? `${tierAmt(x.from)} – ไม่ถึง ${tierAmt(x.to+1)}` : `${tierAmt(x.from)}–${tierAmt(x.to)}`) : `${tierAmt(x.from)} ขึ้นไป`);
 const grossOf = r => r ? Math.round(r.base*S.sa/1000*100)/100 : 0;
+/* savings line: discount per year and over the whole payment term */
+const saveText = r => { const y=grossOf(r)-r.prem; return `ประหยัดได้ ${money(y)} บาท/ปี รวม ${money(y*r.yrs)} บาท ตลอด ${r.yrs} ปีที่ชำระเบี้ย`; };
 const tierSave = r => r ? Math.round((r.big ? (r.base-r.rate)*S.sa/1000 : r.d*S.sa/1000)*100)/100 : 0;
 /* summary of every discount tier, marking the one that applies */
+/* tier discount as baht/year: at the current SA for the tier it is in, at the tier's starting SA otherwise */
+const tierOn = x => S.sa>=x.from && (x.to==null || S.sa<=x.to);
+function tierBaht(p,x){
+  const sa=tierOn(x)?S.sa:x.from, r=calc(p,S.term,S.g,S.age,sa); if(!r) return x.txt;
+  const d=Math.round((r.base*sa/1000-r.prem)*100)/100;
+  return d>0.004 ? `ลด ${money(d)} บาท/ปี${tierOn(x)?'':' ขึ้นไป'}` : 'ไม่มีส่วนลด';
+}
+const tierRate = x => x.txt==='ไม่มีส่วนลด' ? '' : x.txt.replace(/^ลด /,'');
 function tierSummary(p,r){
   const t=tiersOf(p);
   if(!t.length) return {html:'<p class="tiersum-h">ส่วนลดตามทุนประกัน</p><p class="tiersum-none">แบบนี้ไม่มีส่วนลดตามทุนประกัน</p>', text:['ส่วนลดตามทุนประกัน: แบบนี้ไม่มีส่วนลด']};
   const on=x=>S.sa>=x.from && (x.to==null || S.sa<=x.to), save=tierSave(r);
   return {
-    html:`<p class="tiersum-h">ส่วนลดตามทุนประกัน</p><ul class="tiersum">${t.map(x=>`<li class="${on(x)?'on':''}"><span>${tierRange(x)}</span><b>${x.txt}${on(x)?' ✓':''}</b></li>`).join('')}</ul><p class="tiersum-save">${save>0?`ก่อนส่วนลด ${money(grossOf(r))} − ส่วนลด ${money(grossOf(r)-r.prem)} = หลังส่วนลด ${money(r.prem)} บาท/ปี`:'ทุนนี้ยังไม่ได้ส่วนลด'}</p>`,
-    text:[['ส่วนลดตามทุนประกัน:', ...t.map(x=>`• ${tierRange(x)}: ${x.txt}${on(x)?' ✓ (ระดับที่ได้)':''}`)].join('\n'), save>0?`ส่วนลดที่ได้รับ: ${money(grossOf(r)-r.prem)} บาท/ปี`:'ทุนนี้ยังไม่ได้ส่วนลด']
+    html:`<p class="tiersum-h">ส่วนลดตามทุนประกัน</p><ul class="tiersum">${t.map(x=>`<li class="${on(x)?'on':''}"><span>${tierRange(x)}</span><b>${tierBaht(p,x)}${on(x)?' ✓':''}<small>${tierRate(x)}</small></b></li>`).join('')}</ul><p class="tiersum-save">${save>0?`ก่อนส่วนลด ${money(grossOf(r))} − ส่วนลด ${money(grossOf(r)-r.prem)} = หลังส่วนลด ${money(r.prem)} บาท/ปี<br><b>${saveText(r)}</b>`:'ทุนนี้ยังไม่ได้ส่วนลด'}</p>`,
+    text:[['ส่วนลดตามทุนประกัน:', ...t.map(x=>`• ${tierRange(x)}: ${tierBaht(p,x)}${tierRate(x)?` (${tierRate(x)})`:''}${on(x)?' ✓ (ระดับที่ได้)':''}`)].join('\n'), save>0?saveText(r):'ทุนนี้ยังไม่ได้ส่วนลด']
   };
 }
 function renderTiers(p,r){
   const t=tiersOf(p), sa=S.sa;
-  setHTML($('saTiers'), t.map(x=>`<button type="button" data-sa="${x.from}"><span>${tierRange(x)}</span><b>${x.txt}</b></button>`).join(''));
+  setHTML($('saTiers'), t.map(x=>`<button type="button" data-sa="${x.from}"><span>${tierRange(x)}</span><b>${tierBaht(p,x)}</b><small>${tierRate(x)}</small></button>`).join(''));
   [...$('saTiers').children].forEach((b,i)=>b.classList.toggle('on', isFinite(sa) && sa>=t[i].from && (t[i].to==null || sa<=t[i].to)));
   $('saTiers').hidden=!t.length;
   let msg='แบบนี้ไม่มีส่วนลดตามทุนประกัน';
@@ -487,7 +693,7 @@ function renderTiers(p,r){
     const save = tierSave(r);
     const next = t.find(x=>x.from>sa);
     msg = save>0 ? `ได้ส่วนลด ${money(save)} บาท/ปี` : 'ทุนนี้ยังไม่ได้ส่วนลด';
-    if(next) msg += ` · เพิ่มทุนเป็น ${fmt0(next.from)} บาท ได้${next.txt}`;
+    if(next) msg += ` · เพิ่มทุนเป็น ${fmt0(next.from)} บาท ได้${tierBaht(p,next).replace(' ขึ้นไป','')}`;
   } else if(t.length) msg='';
   $('saDisc').textContent=msg;
 }
@@ -584,7 +790,7 @@ function render(){
     if(r.big) rows.push([`ส่วนลด ${p.legacyDisc[S.term]}% (ทุนตั้งแต่ 20 ล้าน)`,'−'+fmt2(r.base-r.rate),'neg']);
     if(r.d) rows.push(['ส่วนลดตามทุนประกัน / ทุน 1,000','−'+fmt2(r.d),'neg']);
     if(r.big||r.d) rows.push(['อัตราสุทธิ / ทุน 1,000',fmt2(r.net)]);
-    if(tierSave(r)>0){ const g0=grossOf(r); rows.push(['เบี้ยแบบหลักก่อนส่วนลด / ปี',money(g0)+' บาท'],['หักส่วนลด / ปี','−'+money(g0-r.prem)+' บาท','neg'],['เบี้ยแบบหลักหลังส่วนลด / ปี',money(r.prem)+' บาท','net']); }
+    if(tierSave(r)>0){ const g0=grossOf(r); rows.push(['เบี้ยแบบหลักก่อนส่วนลด / ปี',money(g0)+' บาท'],['หักส่วนลด / ปี','−'+money(g0-r.prem)+' บาท','neg'],['เบี้ยแบบหลักหลังส่วนลด / ปี',money(r.prem)+' บาท','net'],[`ประหยัดรวมตลอด ${r.yrs} ปี`,money((g0-r.prem)*r.yrs)+' บาท','net']); }
     rows.push(['จำนวนปีที่ชำระเบี้ย',r.yrs+' ปี']);
     if(p.extra) rows.push(...p.extra(r,S.g,S.sa));
     $('sDetail').innerHTML=rows.map(([k,v,c])=>`<dt>${k}</dt><dd${c?` class="${c}"`:''}>${v}</dd>`).join('');
@@ -607,13 +813,13 @@ function render(){
 }
 
 function renderRiders(){
-  const free=RIDERS.filter(d=>!S.riders.some(x=>x.id===d.id));
+  const free=RIDERS.filter(d=>riderAllowed(d.id)&&!S.riders.some(x=>x.id===d.id));
   const pick=$('riderPick'), pp=$('riderPlanPick'), add=$('riderAdd');
-  const keep=pick.value;
+  const keep=pickDefault ? pickDefault.id : pick.value;
   setHTML(pick, free.length ? groupHTML(RIDER_GROUPS, free, d=>`<option value="${d.id}">${d.name} – ${d.th}</option>`) : '<option value="">เพิ่มครบทุกสัญญาแล้ว</option>');
   if(free.some(d=>d.id===keep)) pick.value=keep;
   const cur=riderDef(pick.value);
-  const keepPlan=pp.value;
+  const keepPlan=pickDefault ? pickDefault.plan : pp.value; pickDefault=null;
   pp.hidden=!!(cur&&!cur.plans); $('riderSaNote').hidden=!pp.hidden;
   if(pp.hidden) $('riderSaNote').textContent= cur.auto ? 'ทุนเท่ากับเบี้ยแบบหลักต่อปี คิดให้อัตโนมัติ' : `ทุนเริ่มต้น ${fmt0(cur.saCfg.def)} บาท ปรับได้หลังกดเพิ่ม`;
   setHTML(pp, cur && cur.plans ? cur.plans.map(pl=>`<option value="${pl.n}">${pl.label}</option>`).join('') : '<option value="">–</option>');
@@ -636,7 +842,7 @@ function renderRiders(){
   }).join(''));
   S.riders.forEach(rd=>{
     const d=riderDef(rd.id), v=riderPrem(rd), el=$(`rider-price-${rd.id}`), [a,b]=planAges(d,rd.plan);
-    const off = v==null ? (S.age<a||S.age>b ? `ไม่รับประกันที่อายุนี้ (${rangeText([a,b],d)})` : d.auto ? (d.main() ? `ไม่มีอัตราสำหรับชำระเบี้ย ${d.main().yrs} ปี ที่อายุนี้ (โบรชัวร์มีอัตรา ${d.terms.join(', ')} ปี)` : 'ยังคำนวณเบี้ยแบบหลักไม่ได้') : (d.saCfg.snap ? saRangeText(d.saCfg) : `ทุนต้องอยู่ระหว่าง ${fmt0(d.saCfg.min)} – ${fmt0(d.saCfg.max)} บาท`)) : '';
+    const off = v==null ? (!riderAllowed(rd.id) ? 'แบบประกันนี้แนบสัญญานี้ไม่ได้ (แนบได้เฉพาะสัญญาอุบัติเหตุ)' : S.age<a||S.age>b ? `ไม่รับประกันที่อายุนี้ (${rangeText([a,b],d)})` : d.auto ? (d.main() ? `ไม่มีอัตราสำหรับชำระเบี้ย ${d.main().yrs} ปี ที่อายุนี้ (โบรชัวร์มีอัตรา ${d.terms.join(', ')} ปี)` : 'ยังคำนวณเบี้ยแบบหลักไม่ได้') : (d.saCfg.snap ? saRangeText(d.saCfg) : `ทุนต้องอยู่ระหว่าง ${fmt0(d.saCfg.min)} – ${fmt0(d.saCfg.max)} บาท`)) : '';
     if(d.auto) el.parentElement.querySelector('small').textContent = d.th + (riderLabel(d,rd)?' · '+riderLabel(d,rd):'');
     el.className = off ? 'rp off' : 'rp'; el.textContent = off || `${money(v)} บาท/ปี`;
     if(d.saCfg && d.saCfg.list){
